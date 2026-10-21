@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+          cache-dependency-path: bookshop-app/package-lock.json
       # ── 3. Install dependencies & build MTA ────────────────────────
       - name: Install dependencies
         run: npm ci
