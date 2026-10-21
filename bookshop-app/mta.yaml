@@ -64,5 +64,5 @@ resources:
     type: org.cloudfoundry.existing-service
     parameters:
       service: cloud-logging
-      service-name: logging
+      service-name: cloud-logging
       service-plan: standard
