@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XP260 Bookshop Demo</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f6f7;
+      color: #1d2d3e;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 80px auto;
+      padding: 0 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 48px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 38px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #556b7f;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .scenario {
+      font-size: 16px;
+      color: #334a5e;
+      margin-bottom: 36px;
+      font-weight: 600;
+    }
+
+    .primary-button {
+      display: inline-block;
+      padding: 14px 24px;
+      background: #0a6ed1;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .primary-button:hover {
+      background: #085caf;
+    }
+
+    .links {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e5;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 24px;
+    }
+
+    .links a {
+      color: #0a6ed1;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+
+      <h1>XP260 Bookshop Demo</h1>
+
+      <div class="subtitle">
+        SAP TechEd 2026 hands-on application for cloud transport,
+        monitoring, failure detection and AI-assisted remediation.
+      </div>
+
+      <a
+        class="primary-button"
+        href="/admin-books/webapp/index.html">
+        Open Bookshop Application
+      </a>
+
+      <div class="links">
+        <a href="/odata/v4/admin/">OData Service</a>
+        <a href="/odata/v4/admin/$metadata">Service Metadata</a>
+        <a href="/odata/v4/admin/Books">Books Endpoint</a>
+        <a href="/odata/v4/admin/Authors">Authors Endpoint</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

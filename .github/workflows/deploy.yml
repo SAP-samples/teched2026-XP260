@@ -1,0 +1,42 @@
+name: Build and Transport to cTMS
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'bookshop-app/**'
+defaults:
+  run:
+    working-directory: bookshop-app
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      # ── 2. Set up Node.js ──────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      # ── 3. Install dependencies & build MTA ────────────────────────
+      - name: Install dependencies
+        run: npm ci
+      - name: Install MTA Build Tool
+        run: npm install -g mbt
+      - name: Build .mtar
+        id: build
+        run: |
+          mbt build                                                        # compile MTA project into .mtar archive
+          MTAR_PATH=$(find mta_archives -name "*.mtar" | head -1)         # locate generated archive
+          echo "mtar_path=$MTAR_PATH" >> "$GITHUB_OUTPUT"                 # expose path for downstream steps
+          echo "mtar_name=$(basename "$MTAR_PATH" .mtar)" >> "$GITHUB_OUTPUT"  # expose name without extension
+
+      # ── 4. Upload .mtar as workflow artifact ───────────────────────
+      - name: Upload .mtar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build.outputs.mtar_name }}   # artifact label = archive name, e.g. capire.bookshop_1.0.0
+          path: bookshop-app/${{ steps.build.outputs.mtar_path }}   # prefixed with subfolder since upload-artifact runs from repo root

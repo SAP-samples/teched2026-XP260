@@ -1,0 +1,68 @@
+_schema-version: '3.1'
+ID: capire.bookshop
+version: 1.0.0
+description: "Bookshop demo app with artificial memory pressure for XP260."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npx -p @sap/cds-dk cds build --production
+        # include the app in the deployment artifact
+        - cp -r app gen/srv/
+        # include the .cds for re-use in app
+        - cp srv/admin-service.cds gen/srv/srv/
+        - mkdir -p gen/srv/db
+        # includes initial data for the app
+        - cp -r db/data gen/srv/db/
+        - cp db/schema.cds gen/srv/db/
+        - rm gen/srv/srv/csn.json
+        # include the memory allocator so srv/admin-service.js can require it
+        - cp memory-allocator.js gen/srv/
+        # include the custom server bootstrap for cf-nodejs-logging-support
+        - cp server.js gen/srv/
+modules:
+  - name: bookshop-srv
+    type: nodejs
+    path: gen/srv
+    properties:
+      SAP_CALM_SERVICE_NAME: bookshop-srv
+      SAP_CALM_SERVICE_TYPE: SAP_CP_CF
+    parameters:
+      buildpack: nodejs_buildpack
+      stack: cflinuxfs5
+      memory: 425M
+      disk-quota: 1024M
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: bookshop-auth
+      - name: bookshop-dest
+      - name: bookshop-logging
+
+resources:
+  - name: bookshop-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: bookshop-${org}-${space}
+        tenant-mode: dedicated
+  - name: bookshop-dest
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service: destination
+      service-plan: lite
+  - name: bookshop-logging
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service: cloud-logging
+      service-name: logging
+      service-plan: standard

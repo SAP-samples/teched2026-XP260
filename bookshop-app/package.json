@@ -1,0 +1,82 @@
+{
+    "name": "@capire/bookshop",
+    "version": "1.0.0",
+    "description": "A simple self-contained bookshop service with artificial memory pressure.",
+    "files": [
+        "app",
+        "srv",
+        "db",
+        "index.cds",
+        "index.js",
+        "server.js",
+        "memory-allocator.js"
+    ],
+    "workspaces": [
+        "app",
+        "app/admin-books"
+    ],
+    "dependencies": {
+        "@sap/cds": "^9.7.1",
+        "@sap/cds-dk": "^9.7.1",
+        "@cap-js-community/odata-v2-adapter": "^1.15.0",
+        "@sap/xssec": "^4.0.0",
+        "express": "^5.0.0",
+        "passport": "^0.7.0",
+        "@cap-js/sqlite": "^2",
+        "cf-nodejs-logging-support": "^8.1.1"
+    },
+    "devDependencies": {
+        "@sap/ux-specification": "^1.120.0",
+        "axios": "^1",
+        "chai": "^6.2.0",
+        "chai-as-promised": "^8.0.0",
+        "chai-subset": "^1.6.0",
+        "semver": "^7.6.0"
+    },
+    "scripts": {
+        "start": "cds deploy && cds run",
+        "watch": "cds watch",
+        "undeploy": "cf undeploy capire-bookshop --delete-services --delete-service-keys --delete-service-brokers",
+        "deploy": "cf deploy gen/mta.tar -f"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "cds": {
+        "server": {
+    		"index": true
+  		},
+        "features": {
+            "fiori_preview": true,
+            "fiori_routes": true
+        },
+        "requires": {
+            "db": "sql",
+            "auth": {
+                "kind": "dummy"
+            },
+            "[production]": {
+                "db": {
+                    "kind": "sqlite",
+                    "credentials": {
+                        "database": "bookshop.db"
+                    }
+                },
+                "auth": {
+                    "kind": "dummy"
+                }
+            },
+            "[development]": {
+                "db": {
+                    "kind": "sqlite",
+                    "credentials": {
+                        "database": "bookshop.db"
+                    }
+                }
+            }
+        }
+    },
+    "sapux": [
+        "app/admin-books"
+    ]
+}
