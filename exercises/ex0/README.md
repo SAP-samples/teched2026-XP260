@@ -1,26 +1,35 @@
-# Level 1 Heading
+# Exercise 0 - Get to Know the Application and Landscape
 
-In this exercise, you will...
+In this exercise, you will familiarise yourself with the sample application and the SAP BTP landscape used throughout the hands-on. At the end, you will know which subaccounts are involved, what the application does, and where the transport pipeline starts.
 
-## Level 2 Heading
+## Exercise 0.1 - Review the Application
 
-After completing these steps you will have....
+The hands-on uses a prepared GitHub repository containing a CAP bookshop application that is already configured for deployment on SAP BTP.
 
-1.	Click here.
-<br>![](/exercises/ex0/images/00_00_0010.png)
+The application has two important characteristics:
 
-2.	Insert this code.
-``` abap
- DATA(params) = request->get_form_fields(  ).
- READ TABLE params REFERENCE INTO DATA(param) WITH KEY name = 'cmd'.
-  IF sy-subrc <> 0.
-    response->set_status( i_code = 400
-                     i_reason = 'Bad request').
-    RETURN.
-  ENDIF.
-```
+- It depends on the **SAP Destination service** — a binding that must exist in the target subaccount for the deployment to succeed.
+- It intentionally generates increasing RSS memory consumption and continuously writes corresponding application logs — giving you observable signals to investigate later in the hands-on.
+
+You do not need to clone or modify the repository. It is already connected to the transport pipeline and a deployment artifact will be created in Exercise 1.
+
+## Exercise 0.2 - Review the SAP BTP Landscape
+
+The hands-on uses three subaccounts:
+
+| Subaccount | Role | What it hosts |
+|---|---|---|
+| `XP260_S0XX` | Source | SAP Cloud Transport Management, SAP Content Agent Service, the Git repository connection, SAP Automation Pilot |
+| `XP260_T0XX` | Target | The deployed bookshop application, SAP Cloud Logging |
+
+Replace `XX` with your seat number (e.g., `XP260_S001` for seat 01).
+
+1. Open the [BTP Cockpit](https://emea.cockpit.btp.cloud.sap/cockpit/?idp=tdct3ched1.accounts.ondemand.com) and sign in with your participant credentials (`xp260-0XX@education.cloud.sap`).
+
+2. Confirm you can see the **XP260_S0XX** (source) and **XP260_T0XX** (target) subaccounts in your global account.
 
 ## Summary
 
-Now that you have ... 
-Continue to - [Exercise 1 - Exercise 1 Description](../ex1/README.md)
+You have reviewed the bookshop application and the three-subaccount BTP landscape used in this hands-on.
+
+Continue to - [Exercise 1 - Export an Application with SAP Content Agent Service](../ex1/README.md)
