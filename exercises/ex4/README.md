@@ -6,11 +6,29 @@ In this exercise, you will use SAP Automation Pilot to create a remediation comm
 
 **Learning Objective**: Build a reusable SAP Automation Pilot command from scratch that provisions the missing **Destination service** instance in your target subaccount — the dependency whose absence caused the transport to fail in Exercise 2.
 
-You will compose your command on top of the SAP-provided building block **`cf-sapcp:CreateCfServiceInstance:1`**, which creates a service instance in a Cloud Foundry space. Your finished command, **`XP260CreateDestination`**, is a thin wrapper that pre-fills the destination-specific values and injects your environment and credentials, so that at run time you only supply the instance name.
+You will compose your command on top of the SAP-provided command  **`CreateCfServiceInstance`**, which creates a service instance in a Cloud Foundry space. Your finished command, **`XP260CreateDestination`**, is a thin wrapper that pre-fills the destination-specific values and injects your environment and credentials, so that at run time you only supply the instance name.
 
 > **Context:** SAP Automation Pilot organizes automations into **catalogs** of **commands**. A command is built from one or more **executors** (reusable building blocks). Reusable values such as credentials and your target environment are stored once as **inputs** and referenced by commands , so you never paste secrets into a command definition. In this exercise these inputs are **pre-configured for you**.
 
 #### Step 1. Review the Pre-Configured Inputs
+
+First, let's navigate to your Automation Pilot: 
+
+1. In the SAP BTP cockpit, navigate to your subaccount `XP260_S0XX` (e.g. **XP260_S001** — replace `01` with your seat number).
+
+2. In the left navigation, go to **Services** > **Instances and Subscriptions**.
+
+3. On the **Subscriptions** tab, find **Automation Pilot** and click the link to open it.
+<br><img src="images/ex04-00-01.png" />
+   
+Note: if prompted to sign in, select **tdct3ched1.accounts.ondemand.com** as the identity provider — not the Default Identity Provider.
+
+   <br><img src="images/ex04-00-02.png" />
+
+   *Select tdct3ched1.accounts.ondemand.com to sign in*
+
+Welcome to Automation Pilot - now you see the Automation Pilot dashboard: 
+<br><img src="images/ex04-00-03.png" />
 
 Before building the command, look at the **inputs** already set up in your catalog. Open **Catalogs**, and on the **01-AutomatedSetup** catalog choose **Inputs**.
 
@@ -32,40 +50,45 @@ Open **`targetEnvironment`** to see its keys: `org` (the organization GUID), `re
 #### Step 2. Create a New Command
 
 1. Go back to **Catalogs** and on **01-AutomatedSetup** choose **Commands**.
-
 <br><img src="images/ex04-01_04.png" />
 
 2. Choose **Create**.
-
 <br><img src="images/ex04-01_05.png" />
 
 3. In the **Create Command** dialog, keep the catalog as **01-AutomatedSetup**, set the **Name** to **`XP260CreateDestination`**, add a description such as *"Provision the Destination service instance in the target subaccount."*, and choose **Create**.
-
 <br><img src="images/ex04-01_06.png" />
 
 The new command opens with an empty **Contract** (no input or output keys yet) and an empty **Configuration**.
+<br><img src="images/ex04-00-04.png" />
 
 #### Step 3. Add the Input Keys and Bind Them to the Stored Inputs
 
-First, let's define the command's **Input Keys**. In the **Contract → Input Keys** section, choose **Add** for each key below.
+First, let's define the command's **Input Keys**. 
+In the **Contract → Input Keys** section, choose **Add** for each key below.
+<br><img src="images/ex04-00-04.png" />
 
-**`instanceName`** — the only value supplied at run time. Name `instanceName`, Type `string`, **Required** on. No default value.
+Now, let's create the needed inputs one by one. 
+
+**`instanceName`** — Name `instanceName`, Type `string`, **Required** "enabled" and click the "Add" button.
 
 <br><img src="images/ex04-01_11.png" />
 
-**`org`** — bound to the stored environment. Name `org`, Type `string`, **Default Value Source: Input Key**, **Input: `targetEnvironment`**, **Input Key: `org`**.
+**`org`** — bound to the stored environment. Name `org`, Type `string`, **Default Value Source: Input Key**, and from the drop-down you need to map the input to **Input: `targetEnvironment`**, **Input Key: `org`**.
 
 <br><img src="images/ex04-01_12.png" />
 
-**`password`** — bound to the technical user. Name `password`, Type `string`, **Sensitive** on, **Default Value Source: Input Key**, **Input: `techUser`**, **Input Key: `pass`**.
+**`password`** — bound to the technical user. Name `password`, Type `string`, **Sensitive** on, **Default Value Source: Input Key**, and from the drop-down you need to map the input to **Input: `techUser`**, **Input Key: `pass`**.
 
-<br><img src="images/ex04-01_13.png" />
+<br><img src="images/ex04-00-06.png" />
 
-**`user`** — bound to the technical user. Name `user`, Type `string`, **Default Value Source: Input Key**, **Input: `techUser`**, **Input Key: `user`**.
+**`user`** — bound to the technical user. Name `user`, Type `string`, **Default Value Source: Input Key**, and from the drop-down you need to map the input to **Input: `techUser`**, **Input Key: `user`**.
 
 <br><img src="images/ex04-01_14.png" />
 
-Add **`region`** and **`space`** the same way, both bound to **`targetEnvironment`** (keys `region` and `space`). When done, your Input Keys show each binding — `org`, `region`, `space` from **targetEnvironment**, and `user`, `password` from **techUser**:
+Add **`region`** and **`space`** the same way, both bound to **`targetEnvironment`** (**region** mapped to `region` and **space** mapped to `space`). 
+
+When done, your Input Keys show each binding — `org`, `region`, `space` from **targetEnvironment**, and `user`, `password` from **techUser**:
+<br><img src="images/ex04-00-07.png" />
 
 > **Note:** Binding an input key's default to a stored input is what lets the command run **without** you typing credentials or environment details — exactly the pattern a Joule AI agent relies on in Exercise 6.
 
@@ -74,6 +97,8 @@ Add **`region`** and **`space`** the same way, both bound to **`targetEnvironmen
 You will add the executor **first** — with **Automap parameters** enabled, Automation Pilot inspects the chosen command and offers to create matching input keys for you.
 
 1. In the **Configuration → Executors** section, choose **Add**.
+<br><img src="images/ex04-00-08.png" />
+
 2. In the **Add Executor** dialog:
    - **Executor Location**: **Here**
    - **Alias**: `CreateDestinationService`
@@ -82,7 +107,7 @@ You will add the executor **first** — with **Automap parameters** enabled, Aut
    - **Automap parameters**: **enabled**
 3. Choose **Add**.
 
-<br><img src="images/ex04-01_16.png" />
+<br><img src="images/ex04-00-09.png" />
 
 The executor now appears in the flow (**input → CreateDestinationService → output**). Its parameters are listed, but a few still show `None` — you will fill those next.
 
@@ -110,7 +135,7 @@ Your command is now complete and ready. The **Input Keys** show every binding, a
 
 <br><img src="images/ex04-01_19-v2.png" />
 
-> **Note:** Your command is functionally equivalent to the reference command `XP260CreateDestination`: a one-executor wrapper around `cf-sapcp:CreateCfServiceInstance:1` that provisions the `destination`/`lite` service, with everything except `instanceName` resolved automatically from the stored inputs.
+> **Note:** Your command is functionally equivalent to the reference command `XP260CreateDestination`: a one-executor wrapper around `CreateCfServiceInstance` provided command in SAP Automation Pilot which is not configured to provisions the `destination` service with plan `lite` , with everything except `instanceName` (that is to be defined dynamically at the moment the command runs), all resolved automatically from the stored inputs.
 
 #### Exercise Summary
 
