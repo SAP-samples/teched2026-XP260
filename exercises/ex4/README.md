@@ -8,7 +8,7 @@ In this exercise, you will use SAP Automation Pilot to create a remediation comm
 
 You will compose your command on top of the SAP-provided building block **`cf-sapcp:CreateCfServiceInstance:1`**, which creates a service instance in a Cloud Foundry space. Your finished command, **`XP260CreateDestination`**, is a thin wrapper that pre-fills the destination-specific values and injects your environment and credentials, so that at run time you only supply the instance name.
 
-> **Context:** SAP Automation Pilot organizes automations into **catalogs** of **commands**. A command is built from one or more **executors** (reusable building blocks). Reusable values such as credentials and your target environment are stored once as **inputs** and referenced by commands, so you never paste secrets into a command definition. In this exercise these inputs are **pre-configured for you**.
+> **Context:** SAP Automation Pilot organizes automations into **catalogs** of **commands**. A command is built from one or more **executors** (reusable building blocks). Reusable values such as credentials and your target environment are stored once as **inputs** and referenced by commands , so you never paste secrets into a command definition. In this exercise these inputs are **pre-configured for you**.
 
 #### Step 1. Review the Pre-Configured Inputs
 
