@@ -20,7 +20,7 @@ You need access to your **target subaccount** (`XP260_T0XX`) and your deployed J
 Each participant has their **own dedicated Joule agent**, reachable at a personal URL that matches your participant number. For example, participant **XP260-001** opens:
 
 ```
-https://xp260-000-0d63gfyl.eu10.sapdas.cloud.sap/webclient/standalone/da_xp260u000
+https://xp260-000-0d63gfyl.eu10.sapdas.cloud.sap/webclient/standalone/da_xp260u001
 ```
 
 > **Note:** Use the URL for *your* participant number (shared with you at the start of the session) — it is already wired to your subaccount, MCP servers and credentials.
