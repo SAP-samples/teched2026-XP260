@@ -1,11 +1,14 @@
 # Exercise 6 - AI Agent for Day 2 Operations with Joule
 
-In this exercise, you will interact with a Joule AI agent to perform the same operational tasks you did manually in earlier exercises — but now the agent reasons about the situation and invokes the SAP Automation Pilot commands on your behalf.
+In this exercise, **you will interact with a Joule AI agent to perform the operational tasks using the commands in SAP Automation Pilot** you created in the previous exercises.  Also, the AI agent reasons about the situation and invokes more commands in SAP Automation Pilot (already pre-configured) on your behalf.
 
 A Joule agent has already been created and deployed for each participant in Joule Studio. The agent is connected to two MCP servers that expose the SAP Automation Pilot commands:
 
-- **Transport remediation** — assess, diagnose, remediate and verify Cloud Transport Management (cTMS) transport requests.
-- **Application operations** — list apps, check memory utilization, analyze logs and memory trends, and scale an application.
+**Transport remediation** (MCP server #1, already pre-configured for you) — assess, diagnose, remediate and verify Cloud Transport Management (cTMS) transport requests.
+<br><img src="images/ex06-00-01.png" />
+
+**Application operations** (MCP server #2, already pre-configured for you) — list apps, check memory utilization, analyze logs and memory trends, and scale an application.
+<br><img src="images/ex06-00-02.png" />
 
 The agent already has the target environment (region, space, organization) and all credentials injected, so **you never need to provide service keys, org, space, or node ids** — you simply describe what you want in natural language.
 
