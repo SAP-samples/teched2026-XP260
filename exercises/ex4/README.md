@@ -52,8 +52,10 @@ Open **`targetEnvironment`** to see its keys: `org` (the organization GUID), `re
 1. Go back to **Catalogs** and on **01-AutomatedSetup** choose **Commands**.
 <br><img src="images/ex04-01_04.png" />
 
+
 2. Choose **Create**.
 <br><img src="images/ex04-01_05.png" />
+
 
 3. In the **Create Command** dialog, keep the catalog as **01-AutomatedSetup**, set the **Name** to **`XP260CreateDestination`**, add a description such as *"Provision the Destination service instance in the target subaccount."*, and choose **Create**.
 <br><img src="images/ex04-01_06.png" />
@@ -224,7 +226,6 @@ With Automap on, the executor's parameters are mapped to your input keys automat
 <br><img src="images/ex04-02_13_2.png" />
 
 Your command is now complete — inputs, output mapping, and the executor all in place:
-
 <br><img src="images/ex04-02_13_3.png" />
 
 ### 4.2.2 - Check the Automations in Place
