@@ -207,7 +207,7 @@ Your Contract now has three input keys and one output key:
 
 2. In the **Add Executor** dialog set **Executor Location: Here**, **Alias: `ImportTransport`**, **Command: `ImportTransportRequests`** , **Automap parameters: enabled**, and choose **Add**.
 
-<br><img src="images/ex04-00-10.png" /> 
+<br><img src="images/ex04-00-11.png" /> 
 
 With Automap on, the executor's parameters are mapped to your input keys automatically — `nodeId`, `serviceKey`, and `transportRequestIds` all resolve to `$(.execution.input.*)` (and `timeout` keeps its default):
 
