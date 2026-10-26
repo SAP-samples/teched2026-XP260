@@ -145,54 +145,53 @@ You created a reusable remediation command from scratch: you reviewed the pre-co
 
 **Learning Objective**: Build a second command — again from scratch, using only a provided SAP Cloud Transport Management (cTMS) command — that re-imports a failed transport request. 
 
-Once the commands are avialble, we'll have in tplace the needed automatoons to complete a successful deployment:
+Once the commands are available, you will have in place the needed automations to complete a successful deployment:
 
-1. Provision the missing Destination service in the target subaccount (the `XP260CreateDestination` command you built in 4.1) [**NOTE**: DO NOT RUN IT NOW] 
-2. Retrigger the failed transport request and read the result [**NOTE**: DO NOT RUN IT NOW] 
+1. Provision the missing Destination service in the target subaccount (the `XP260CreateDestination` command you built in 4.1) 
+[**NOTE**: DO NOT RUN IT NOW] 
+
+2. Retrigger the failed transport request and read the result.
+[**NOTE**: DO NOT RUN IT NOW] 
 
 ### 4.2.1 - Build a "Retry Transport" Command
 
-You will compose this command on top of the provided building block **`ctms-sapcp:ImportTransportRequests:1`**, which imports transport requests into a Cloud Transport Management node. Your command exposes the two values you need — the **transport request id(s)** and the **node id** — and injects the cTMS credentials for you.
+You will compose this command on top of the provided command **`ctms-sapcp:ImportTransportRequests:1`**, which imports transport requests into a Cloud Transport Management node. Your command exposes the two values you need — the **transport request id(s)** and the **node id** — and injects the cTMS credentials for you.
 
 > **Context:** `ctms-sapcp:ImportTransportRequests:1` imports a *list* of transport request ids into a node, so the `transportRequestIds` input is an **array**. The cTMS **service key** is read from a pre-configured input, so you never paste it.
 
 #### Step 1. Create a New Command
 
 1. Open **Catalogs** and on the **02-CTMS** catalog choose **Commands**.
-
 <br><img src="images/ex04-02_01.png" />
 
 2. Choose **Create**.
-
 <br><img src="images/ex04-02_02.png" />
 
 3. Keep the catalog as **02-CTMS**, set the **Name** to **`XP260RetryTransport`**, add a description such as *"Retry transport request command"*, and choose **Create**.
-
 <br><img src="images/ex04-02_03.png" />
 
 The new command opens with an empty **Contract**. Choose **Add** under **Input Keys**.
-
 <br><img src="images/ex04-02_04.png" />
 
 #### Step 2. Add the Input Keys
 
-**`transportRequestIds`** — the ids to re-import. Name `transportRequestIds`, **Type: `array`**, **Required** on.
-
+**`transportRequestIds`** — the ids to re-import. **Name** `transportRequestIds`, **Type: `array`**, **Required** on.
 <br><img src="images/ex04-02_12.png" />
 
 > **Note:** `transportRequestIds` is an **array**, because the cTMS executor imports a list of ids. When you run the command you will provide it in array form, e.g. `[848]`.
 
-**`nodeId`** — the transport node. Name `nodeId`, Type `number`, **Required** on.
-
+**`nodeId`** — the transport node. **Name** `nodeId`, **Type** `number`, **Required** on.
 <br><img src="images/ex04-02_06.png" />
 
-**`serviceKey`** — the cTMS credentials. Name `serviceKey`, Type `object`, **Sensitive** on, **Default Value Source: Input Key**, **Input: `cTMS`**, **Input Key: `serviceKey`**.
-
+**`serviceKey`** — the cTMS credentials. **Name** `serviceKey`, **Type** `object`, **Sensitive** on, **Default Value Source: Input Key**, and map it tp **Input: `cTMS`**, **Input Key: `serviceKey`**.
 <br><img src="images/ex04-02_07.png" />
 
 #### Step 3. Add the Output Key
 
-Choose **Add** under **Output Keys** and add **`actionId`** (Type `string`, description *"ID of the import action created in Cloud Transport Management"*).
+Choose **Add** under **Output Keys**: 
+<br><img src="images/ex04-00-10.png" /> 
+
+Then, add **`actionId`** : **Type** `string`, **description** *"ID of the import action created in Cloud Transport Management"*).
 
 <br><img src="images/ex04-02_08.png" />
 
@@ -206,9 +205,9 @@ Your Contract now has three input keys and one output key:
 
 <br><img src="images/ex04-02_10.png" />
 
-2. In the **Add Executor** dialog set **Executor Location: Here**, **Alias: `ImportTransport`**, **Command: `ImportTransportRequests`** (`ctms-sapcp:ImportTransportRequests:1`), **Automap parameters: enabled**, and choose **Add**.
+2. In the **Add Executor** dialog set **Executor Location: Here**, **Alias: `ImportTransport`**, **Command: `ImportTransportRequests`** , **Automap parameters: enabled**, and choose **Add**.
 
-<br><img src="images/ex04-02_11.png" />
+<br><img src="images/ex04-00-10.png" /> 
 
 With Automap on, the executor's parameters are mapped to your input keys automatically — `nodeId`, `serviceKey`, and `transportRequestIds` all resolve to `$(.execution.input.*)` (and `timeout` keeps its default):
 
@@ -249,7 +248,7 @@ IMPORTAN: You'll use these command in an agentic manner, as an AI Day 2 Operatio
 
 You built a second command from scratch using only a provided cTMS building block, with a `transportRequestIds` array, a `nodeId`, and an injected service key. You are all set to use the commands with an AI Ops Agent to provisioning the missing service, reading the failed transport's ids from the stored alert, and re-importing the transport — and confirmed a successful deployment with a running application.
 
-## Exercise 4.3 - Expose the Automation through MCP (Optional)
+## Exercise 4.3 - Expose the Automation through MCP
 
 **Learning Objective**: Understand what the Model Context Protocol (MCP) is, how SAP Automation Pilot exposes commands as MCP tools, and build your own MCP server that publishes the two commands you created — ready for a Joule AI agent to discover and invoke in Exercise 6.
 
@@ -265,7 +264,7 @@ An MCP server definition has these top-level properties:
 
 | Property | Purpose |
 |----------|---------|
-| **name** | A unique, kebab-case identifier for the server (e.g. `sample-mcp-server`). |
+| **name** | A unique identifier for the server (e.g. `sample-mcp-server`). |
 | **enabled** | Whether the server (and its tools) are active. |
 | **instructions** | Natural-language guidance telling the agent what this server does and when/how to use its tools — effectively a short *runbook*. |
 | **tools** | The list of commands exposed as callable tools. |
@@ -274,15 +273,15 @@ Each **tool** maps one Automation Pilot command to an agent-callable capability:
 
 | Tool field | Purpose |
 |------------|---------|
-| **commandId** | The command to expose, e.g. `<your-catalog>:XP260CreateDestination:1`. |
-| **name** | Snake_case name the agent sees, e.g. `create_destination` (max 32 characters). |
-| **title** | Human-readable Title Case label, e.g. `Create Destination`. |
-| **enabled** | Whether this individual tool is active. |
-| **inputReferences** | Stored inputs injected at run time (credentials, environment) so the agent never supplies secrets. |
-| **readOnlyHint** | `true` for read-only tools; `false` for tools that change state. |
-| **destructiveHint** | `true` only for tools that delete or irreversibly change state. |
-| **idempotentHint** | `true` for write tools that are safe to repeat. |
-| **openWorldHint** | `true` for discovery across a landscape; `false` for actions on a specific resource. |
+| **Command** | The command to expose, e.g. `<XP260CreateDestination`. |
+| **Name** | Snake_case name the agent sees, e.g. `create_destination` (max 32 characters). |
+| **Title** | Human-readable Title Case label, e.g. `Create Destination`. |
+| **Status Enabled** | Whether this individual tool is active. |
+| **Input References** | Stored inputs injected at run time (credentials, environment) so the agent never supplies secrets. |
+| **Read-Only** | `enabled` for read-only tools; `false` for tools that change state. |
+| **Destructivet** | `enabled` only for tools that delete or irreversibly change state. |
+| **Idempotent** | `enabled` for write tools that are safe to repeat. |
+
 
 ### Good Practices for MCP Servers
 
@@ -291,7 +290,7 @@ Each **tool** maps one Automation Pilot command to an agent-callable capability:
 
 - **Expose only agent-facing commands.** Keep internal helper commands out of the server; publish the ones an agent would actually call.
 - **Write instructions as a runbook.** Describe the purpose, when to use each tool, and the typical order (e.g. *"create the missing service first, then retry the transport, then verify"*).
-- **Set the safety hints honestly.** Mark reads as `readOnlyHint: true`; mark state-changing tools (like retrying a transport) as `readOnlyHint: false`. This helps the agent reason about what is safe to do autonomously.
+- **Set the safety hints honestly.** Mark reads as `Read-Only: enabled`; mark state-changing tools (like retrying a transport) as `Read-Only: disabled`. This helps the agent reason about what is safe to do autonomously.
 - **Inject credentials, never request them.** Use `inputReferences` so the agent never has to ask the user for service keys, credentials, org, space, or region.
 - **Use clear, concise tool names and titles.** `create_destination` / `retry_transport` are easier for the agent to choose than vague names. Keep tool `name` within 32 characters.
 
@@ -299,14 +298,15 @@ Each **tool** maps one Automation Pilot command to an agent-callable capability:
 
 #### Step 1. Open MCP Servers
 
-In **SAP Automation Pilot**, open **MCP Servers** (under *Execution Management*).
+In **SAP Automation Pilot**, open **MCP Servers** (left sidebar menu).
 
 <br><img src="images/ex04-03_01.png" />
 
-You will see the existing MCP servers. Choose **Create**.
+You will see the existing MCP servers. 
 
 <br><img src="images/ex04-03_02.png" />
 
+Choose **Create**.
 <br><img src="images/ex04-03_03.png" />
 
 #### Step 2. Create the Server with Instructions
