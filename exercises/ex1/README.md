@@ -59,7 +59,7 @@ You need access to your **source subaccount** (`XP260_S0XX`). If you need to sig
 
 **Result**: You opened SAP Content Agent Service and confirmed that the **Repository/CAP Application** content type is connected to the bookshop application's Git repository.
 
-> **Further Reading:** SAP Content Agent Service's Git integration supports more than CAP apps — you can also transport Integration Suite artifacts directly from Git. See [Transport CAP Apps and Integration Artefacts Directly from Git with SAP Content Agent Service](https://community.sap.com/t5/technology-blog-posts-by-sap/transport-cap-apps-and-integration-artefacts-directly-from-git-with-sap/ba-p/14497880).
+> **Further Reading:** SAP Content Agent Service can push both CAP applications and SAP Integration Suite artefacts (such as Cloud Integration flows, scripts, and related configuration) directly from a Git repository to create transport requests in SAP Cloud Transport Management. See [Transport CAP Apps and Integration Artefacts Directly from Git with SAP Content Agent Service](https://community.sap.com/t5/technology-blog-posts-by-sap/transport-cap-apps-and-integration-artefacts-directly-from-git-with-sap/ba-p/14497880).
 
 ---
 
