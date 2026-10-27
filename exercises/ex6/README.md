@@ -1,243 +1,452 @@
-# Exercise 6 - AI Agent for Day 2 Operations with Joule
+# Exercise 6 - Explore Application Logs with SAP Cloud Logging
 
-In this exercise, **you will interact with a Joule AI agent to perform the operational tasks using the commands in SAP Automation Pilot** you created in the previous exercises.  Also, the AI agent reasons about the situation and invokes more commands in SAP Automation Pilot (already pre-configured) on your behalf.
+**Human in the Loop: Understanding What the Agent Found**
 
-A Joule agent has already been created and deployed for each participant in Joule Studio. The agent is connected to two MCP servers that expose the SAP Automation Pilot commands:
+In Exercise 5, a Joule AI agent investigated your bookshop application and reported errors, memory pressure, and operational findings. Now you explore the same signals yourself — navigating the SAP Cloud Logging dashboards manually to see exactly what the agent detected.
 
-**Transport remediation** (MCP server #1, already pre-configured for you) — assess, diagnose, remediate and verify Cloud Transport Management (cTMS) transport requests.
-<br><img src="images/ex06-00-01.png" />
+**Your Challenge:**
+Navigate the pre-built Cloud Foundry dashboards in SAP Cloud Logging, analyze request and application logs, and identify the error patterns the Joule agent reported in Exercise 5.
 
-**Application operations** (MCP server #2, already pre-configured for you) — list apps, check memory utilization, analyze logs and memory trends, and scale an application.
-<br><img src="images/ex06-00-02.png" />
+**What You'll Work With:**
+- **SAP Cloud Logging** — OpenSearch-based observability service with pre-built CF dashboards
+- **CF Overview Dashboard** — high-level KPIs for requests and application logs
+- **CF Requests and Logs Dashboard** — detailed log analytics with filtering and correlation
 
-The agent already has the target environment (region, space, organization) and all credentials injected, so **you never need to provide service keys, org, space, or node ids** — you simply describe what you want in natural language.
+**Why This Matters:**
+The agent told you "Book ID 8888 not found" — now you will see where that came from. Understanding the raw observability data behind the agent's findings builds confidence in the automation and sharpens your ability to validate what AI reports.
 
-> **How to work with the agent:** Open your Joule agent and type the prompts shown below. The exact wording does not matter — the agent understands intent, so feel free to rephrase. Where you see a 💬 icon, that is a prompt to type. The screenshots below are **reference interactions**; your transport request ids, node ids and memory figures will differ from the examples.
+*Ready to look inside your running application? Let's investigate.*
+
+
+<details>
+<summary>Table of Contents</summary>
+
+- [Exercise 6 - Explore Application Logs with SAP Cloud Logging](#exercise-6---explore-application-logs-with-sap-cloud-logging)
+      - [Prerequisites](#prerequisites)
+  - [6.1 Open the Bookshop Application](#61-open-the-bookshop-application)
+      - [Step 1. Open the Bookshop Application](#step-1-open-the-bookshop-application)
+      - [Step 2. Browse the Book Catalog](#step-2-browse-the-book-catalog)
+  - [6.2 Navigate to SAP Cloud Logging](#62-navigate-to-sap-cloud-logging)
+      - [Step 1. Open Cloud Logging from the BTP Cockpit](#step-1-open-cloud-logging-from-the-btp-cockpit)
+      - [Step 2. Explore the SAP Cloud Logging Landing Page](#step-2-explore-the-sap-cloud-logging-landing-page)
+      - [Step 3. Explore the CF Overview Dashboard](#step-3-explore-the-cf-overview-dashboard)
+      - [Step 4. Review Available Dashboards and Navigate to Requests and Logs](#step-4-review-available-dashboards-and-navigate-to-requests-and-logs)
+      - [Exercise Summary](#exercise-summary)
+  - [6.3 Investigate Application Errors](#63-investigate-application-errors)
+      - [Step 1. Analyze the Requests and Logs Dashboard](#step-1-analyze-the-requests-and-logs-dashboard)
+      - [Step 2. Filter for Error Logs](#step-2-filter-for-error-logs)
+      - [Exercise Summary](#exercise-summary-1)
+  - [6.4 Analyze Memory Status Logs (Optional)](#64-analyze-memory-status-logs-optional)
+      - [Step 1. Search for Memory-Related Logs Using DQL](#step-1-search-for-memory-related-logs-using-dql)
+      - [Step 2. Edit the Filter to Inspect the Query](#step-2-edit-the-filter-to-inspect-the-query)
+      - [Step 3. Switch to OpenSearch Query DSL](#step-3-switch-to-opensearch-query-dsl)
+      - [Step 4. Broaden the Filter with a Prefix Query](#step-4-broaden-the-filter-with-a-prefix-query)
+      - [Step 5. Review All Memory Status Entries](#step-5-review-all-memory-status-entries)
+      - [Exercise Summary](#exercise-summary-2)
+  - [Summary](#summary)
+
+</details>
 
 #### Prerequisites
 
-You need access to your **target subaccount** (`XP260_T0XX`) and your deployed Joule agent. If you need to sign in, follow the login instructions from the [General Section](../ex0/README.md).
-
-#### Open the Agent
-
-Each participant has their **own dedicated Joule agent**, reachable at a personal URL that matches your participant number. For example, participant **XP260-001** opens:
-
-```
-https://xp260-000-0d63gfyl.eu10.sapdas.cloud.sap/webclient/standalone/da_xp260u001
-```
-
-> **Note:** Use the URL for *your* participant number (shared with you at the start of the session) — it is already wired to your subaccount, MCP servers and credentials.
-
-Open your agent URL. You are greeted with an empty chat and a single message box — everything from here on is natural language.
-
-<br><img src="images/ex06_01.png" />
+You need access to the **target subaccount** (`XP260_T0XX`) where SAP Cloud Logging is bound to the bookshop application and has been collecting logs. If you need to sign in, follow the login instructions from the [General Section](../ex0/README.md).
 
 ---
 
-## Exercise 6.1 - Detect and Diagnose the Failure Agentically
+## 6.1 Open the Bookshop Application
 
-**Learning Objective**: Let the agent detect and diagnose the transport failure that results from the missing Destination service you removed in the prerequisites — without navigating Cloud Transport Management yourself.
+**Learning Objective**: Confirm the bookshop application is running in the target subaccount and trigger backend activity that produces telemetry in SAP Cloud Logging.
 
-Instead of opening the cTMS UI, ask the Joule agent to assess your transport landscape and surface any problems.
+<details>
+<summary>How to find your Bookshop Application URL via BTP Cockpit</summary>
 
-💬 **Prompt:**
+> [!IMPORTANT]
+> Make sure you navigate to your **target** subaccount (`XP260_T0XX`), not the source (`XP260_S0XX`). The bookshop application and SAP Cloud Logging are in the target subaccount.
+
+Your application URL follows the pattern `https://xp260-t0XX-prod-bookshop-srv.cfapps.eu10-005.hana.ondemand.com/` (replace `XX` with your seat number). To find it in the BTP Cockpit:
+
+1. Open the [BTP Cockpit](https://emea.cockpit.btp.cloud.sap/cockpit/?idp=tdct3ched1.accounts.ondemand.com#/globalaccount/b91f4ac2-5fe3-47cc-bcc1-6aa780a0f508/home). On the global account home page, identify your seat number in the greeting ("Hello XP260-0XX!") and click on your **target** subaccount `XP260_T0XX`.
+
+<br><img src="../ex0/images/ex0_01.png" />
+
+2. In the subaccount, expand **Cloud Foundry** in the left navigation, then click **Spaces**. You will see a single space named **prod** — click on it.
+
+<br><img src="../ex0/images/ex0_04.png" />
+
+3. In the **Applications** list, click on **bookshop-srv**.
+
+<br><img src="../ex0/images/ex0_05.png" />
+
+4. On the **Application Overview** page, find the **Mapped Routes** section. The application URL is listed there — click it to open the application in a new tab, or copy it for later use.
+
+<br><img src="../ex0/images/ex0_06.png" />
+
+</details>
+
+
+#### Step 1. Open the Bookshop Application
+
+Open your bookshop application in the **target** subaccount. Your URL follows this pattern (replace `XX` with your seat number):
+
 ```
-Is my transport landscape healthy? Are there any failed transport requests?
+https://xp260-t0XX-prod-bookshop-srv.cfapps.eu10-005.hana.ondemand.com/
 ```
 
-Behind the scenes, the agent uses the SAP Automation Pilot transport-remediation commands to scan your transport nodes. It returns a **Transport Landscape Health Assessment**: an overall verdict (⚠️ *Unhealthy*), how many nodes were scanned, how many transport requests failed, and a table of the failing requests with their id, status (`Fatal`), node and description.
+If you are unsure how to find the URL, expand the section above for step-by-step cockpit navigation.
 
-<br><img src="images/ex06_02.png" />
+You will see the **XP260 Bookshop Demo** page with a button to open the application and several API endpoint links.
 
-Now drill into the failing request to understand *why* it failed. Use the transport request id the agent just reported.
+1. Click **Open Bookshop Application** to enter the admin books view.
 
-💬 **Prompt:**
+<br><img src="images/ex5_01.png" />
+
+*Bookshop Demo landing page with the application link and API endpoints*
+
+
+#### Step 2. Browse the Book Catalog
+
+You now see the **Admin Books** view listing 5 books (Wuthering Heights, Jane Eyre, The Raven, Eleonora, Catweazle).
+
+The application appears healthy from here — but behind the scenes, it is generating error-level log entries for book IDs that do not exist in the catalog. These errors are already being collected by SAP Cloud Logging.
+
+<br><img src="images/ex5_02.png" />
+
+*Admin Books view showing the book catalog — the app looks healthy from here*
+
+---
+
+
+## 6.2 Navigate to SAP Cloud Logging
+
+**Learning Objective**: Access SAP Cloud Logging from the BTP cockpit and orient yourself in the pre-built Cloud Foundry monitoring dashboards.
+
+
+#### Step 1. Open Cloud Logging from the BTP Cockpit
+
+Navigate to the **Service Instances** page in your **target** subaccount (`XP260_T0XX`):
+
+1. Open the [BTP Cockpit](https://emea.cockpit.btp.cloud.sap/cockpit/?idp=tdct3ched1.accounts.ondemand.com) and click on your **target** subaccount `XP260_T0XX`.
+2. In the left navigation, go to **Cloud Foundry** → **Spaces** → **prod**.
+3. Click on **Instances** in the space navigation to see the service instances.
+4. In the **Instances** list, find the **logging** entry (Service: Cloud Logging).
+5. Click on **logging** in the Instance column to open the SAP Cloud Logging dashboard.
+
+<br><img src="images/ex5_03.png" />
+
+*BTP Cockpit showing the service instances — click on "cloud-logging" to open the dashboard*
+
+
+#### Step 2. Explore the SAP Cloud Logging Landing Page
+
+You are now on the **"Using your SAP Cloud Logging instance"** landing page.
+
+**What you'll see:**
+- An introduction to the service capabilities
+- Links to **Cloud Foundry dashboards**, **Kyma dashboards**, **OpenTelemetry**, **Service dashboards**, and **Gen AI dashboards**
+- Options to manage alerts, anomaly detection, and saved objects
+
+**Actions to perform:**
+
+1. Read through the capabilities overview (①)
+2. Click on **Cloud Foundry dashboards** (②) to navigate to the CF-specific monitoring views
+
+<br><img src="images/ex5_04.png" />
+
+*SAP Cloud Logging landing page — click "Cloud Foundry dashboards" to proceed*
+
+
+<details>
+    <summary>📷💡 Troubleshooting: "Welcome to SAP Cloud Logging" doesn't show up</summary>
+    <br><img src="images/00_tenant_selection.png" />
+
+*Select "Global" if a tenant selection dialog shows up*
+
+
+**In Case the "Welcome to SAP Cloud Logging" is not visible**
+
+<br><img src="images/00_find_entry.png" />
+
+*Navigate to the "Dashboard" section within SAP Cloud Logging and search for the term "Cloud Logging"*
+
+**Navigate directly via deep link:**
+
+Your SAP Cloud Logging URL starts with `dashboards-...` — you can see it in the browser address bar after opening Cloud Logging from the BTP Cockpit in Step 1. Copy everything before `/app/` (this is your instance-specific base URL), then append:
 ```
-Ok, go for it, let's retrieve detailed logs for transport request <id> to identify why it failed.
+/app/dashboards#/view/maintained-by-perfx_using-your-instance-content-package_Using-your-CLS-instance
 ```
 
-The agent retrieves the transport logs and produces a **Diagnostic Report**: the request's status (⛔ `Fatal`), node, MTA archive, target environment (org and space), and a **Root Cause** section identifying a **Missing Service Instance** — the required Destination service that is absent in the target space, exactly the root cause you investigated manually in the earlier exercises.
+</details>
 
-<br><img src="images/ex06_03.png" />
+
+#### Step 3. Explore the CF Overview Dashboard
+
+You are now on the **CF Overview** dashboard.
+
+<details>
+<summary>Direct dashboard link</summary>
+
+Your SAP Cloud Logging URL starts with `dashboards-...` — you can see it in the browser address bar since opening Cloud Logging from the BTP Cockpit in Step 1. Copy everything before `/app/` (your instance-specific base URL), then append:
+```
+/app/dashboards#/view/maintained-by-perfx_cf-content-package_CF-Overview
+```
+</details>
+
+**What you'll see:**
+- **Requests Overview** on the left: success ratio, P99 response time, average response time, requests per second — all for `bookshop-srv`
+- **Application Logs Overview** on the right: log levels (info, error), logs per second, logs per instance
+- **Time series charts** showing request and log volume over time
+
+**Actions to perform:**
+
+1. Review the request metrics for `bookshop-srv` — note the success ratio and response times (①)
+2. Optionally, expand the time range to **Last 1 hour** using the time picker in the top right (②) to see a broader view of system activity
+
+<br><img src="images/ex5_05.png" />
+
+*CF Overview dashboard showing request and log KPIs for bookshop-srv*
+
+
+#### Step 4. Review Available Dashboards and Navigate to Requests and Logs
+
+With the wider time range, you can now see the full set of Cloud Foundry dashboards in the navigation bar.
+
+**Available dashboards:**
+- **CF Overview** — general application request and log overview
+- **Top Apps** — key performance indicators per application
+- **Four Golden Signals** — latency, traffic, errors, and saturation metrics
+- **Usage** — request-based utilization patterns
+- **Performance and Quality** — response time analysis
+- **History** — historical trends
+- **Requests and Logs** — detailed log analytics
+- **App Crash Detection** — application failure monitoring
+
+Feel free to explore any of these dashboards. For this exercise, we will focus on **Requests and Logs** to investigate the application errors.
+
+1. Optionally, explore the **Top Apps** (①) and **Four Golden Signals** (②) dashboards to see per-application KPIs and the standard latency/traffic/errors/saturation metrics.
+2. Click on **Requests and Logs** (③) in the navigation bar.
+
+<details>
+<summary>Direct dashboard link</summary>
+
+Your SAP Cloud Logging URL starts with `dashboards-...` — you can see it in the browser address bar since opening Cloud Logging from the BTP Cockpit in Step 1. Copy everything before `/app/` (your instance-specific base URL), then append:
+```
+/app/dashboards#/view/maintained-by-perfx_cf-content-package_CF-Requests-and-Logs
+```
+</details>
+
+<br><img src="images/ex5_06.png" />
+
+*CF Overview with all navigation tabs visible — click "Requests and Logs"*
+
 
 #### Exercise Summary
 
-You asked the agent to assess your transports, and it autonomously discovered the failing transport, read its logs, and diagnosed the missing Destination service as the cause — without you touching the cTMS UI.
+**Result**: You have accessed SAP Cloud Logging from the BTP cockpit and explored the pre-built CF dashboards showing request and log KPIs for your bookshop application.
+
+**Key Capabilities Demonstrated:**
+- ✅ **Service discovery**: Finding Cloud Logging in BTP cockpit service instances
+- ✅ **Dashboard navigation**: Using the CF dashboard navigation bar
+- ✅ **KPI interpretation**: Reading success ratios, response times, and log level distributions
 
 ---
 
-## Exercise 6.2 - Let the Agent Remediate the Problem
 
-**Learning Objective**: Have the agent fix the root cause and re-run the transport, demonstrating the shift from manual troubleshooting to AI-assisted, automation-backed remediation.
+## 6.3 Investigate Application Errors
 
-Because the remediation automation already exists in SAP Automation Pilot, the agent can create the missing service itself.
+**Learning Objective**: Use the log analytics interface to identify HTTP errors in request logs and filter application logs by error level to discover specific failure patterns.
 
-💬 **Prompt:**
-```
-Create the missing service for transport request <id>, then retry it and confirm whether it succeeded.
-```
 
-The agent will:
+#### Step 1. Analyze the Requests and Logs Dashboard
 
-1. **Create the missing Destination service** in the correct Cloud Foundry org and space — it reads the target org, space and region from the transport's own logs, so you do not need to supply them.
-2. **Retry (re-import)** the transport request by its id.
-3. **Verify** the new status and report whether the transport now succeeded.
+The **Requests and Logs** dashboard provides a combined view of three distinct log types:
 
-> **Note:** The agent will only retry *after* the root cause is addressed — retrying before the fix would simply fail again. If it is unsure which service to create, it will ask you to confirm the name.
+**What you'll see:**
+- **Requests** panel (top): HTTP transactions with trace IDs, response times, and status codes
+- **Application Logs** panel (bottom): Business logic and custom application log entries
+- **Runtime Logs** panel (below): Platform-level container and deployment information
+- **Sidebar panels** (right): **Levels** pie chart showing the ratio of log levels, plus filter panels for organizations, components, and instances
 
-Ask the agent to confirm the final status of the retried transport. It returns a **Successfully Completed** report with the final status (🎉 *Succeeded*) and a **Summary of Actions Taken** — diagnosed the root cause, created the missing `bookshop-dest` service in the correct org/space, and retried the transport to trigger a fresh deployment.
+**Actions to perform:**
 
-💬 **Prompt:**
-```
-ok, check the status of transport request <id>.
-```
+1. In the **Requests** panel, note the `response_status` column — you will see entries with status **404** alongside successful **200** responses (①)
+2. In the **Application Logs** panel, note the mix of `info` and `error` level entries (②)
+3. In the **Levels** pie chart on the right, observe the error ratio — approximately **18%** of all application logs are errors (③). Click directly on the **error** slice in the pie chart — this immediately applies a filter to the entire dashboard, showing only error-level logs.
 
-<br><img src="images/ex06_04.png" />
+<br><img src="images/ex5_07.png" />
 
-This demonstrates the transition from **manual troubleshooting** to **AI-assisted, automation-backed remediation**.
+*Requests and Logs dashboard showing HTTP 404 errors in requests and the error ratio in the Levels chart*
+
+
+#### Step 2. Filter for Error Logs
+
+After selecting the **error** log level, the dashboard filters to show only error-level application logs.
+
+**What you'll see:**
+- The **Requests** panel now shows "No results found" — there are no request-level errors matching the filter
+- The **Application Logs** panel shows **120 error entries**, all from `bookshop-srv` via the `nodejs-logger`
+- The error messages reveal a clear pattern:
+  - `[Catalog] Book ID 8888 not found. Possible data migration issue.`
+  - `[Catalog] Book ID 9999 not found. Possible data migration issue.`
+
+These are application-level errors: the bookshop service is trying to load books with IDs 8888 and 9999, which do not exist in the catalog database. This could indicate a data migration issue or a misconfigured background process.
+
+To return to the unfiltered view, click the **level.keyword: error** filter pill (②) to remove it.
+
+<br><img src="images/ex5_08.png" />
+
+*Application logs filtered by error level — showing the "Book ID not found" pattern*
+
+> [!IMPORTANT]
+> Remember these error patterns. In Exercise 5, the Joule agent detected and reported exactly these findings — now you can see what they look like in the raw log data.
+
 
 #### Exercise Summary
 
-The agent created the missing Destination service, retried the transport, and confirmed success — closing the deployment loop entirely through natural-language interaction.
+**Result**: You identified two types of issues in the bookshop application: HTTP 404 errors in request logs and application-level "Book ID not found" errors indicating potential data migration problems.
+
+**Background**:
+SAP Cloud Logging automatically ingests Cloud Foundry syslog data, including HTTP request logs from the CF router and application logs emitted by your code. The pre-built **Requests and Logs** dashboard combines these into a single view with filtering and correlation capabilities, enabling full-stack troubleshooting from HTTP requests through application logic.
+
+**Key Capabilities Demonstrated:**
+- ✅ **Multi-tier log analysis**: Simultaneous view of request logs and application logs
+- ✅ **Log level filtering**: Isolating error-level entries to focus on problems
+- ✅ **Pattern recognition**: Identifying recurring error messages across log entries
+- ✅ **Operational readiness**: Building the understanding that powers effective automation
+
+**Further References:**
+- [SAP Cloud Logging Documentation](https://help.sap.com/docs/cloud-logging)
+- [SAP Cloud Logging — Discovery Center](https://discovery-center.cloud.sap/serviceCatalog/cloud-logging)
+- [OpenSearch Dashboard Query Language (DQL)](https://docs.opensearch.org/2.19/dashboards/dql/)
 
 ---
 
-## Exercise 6.3 - Perform an Application Health Analysis
 
-**Learning Objective**: Ask the agent to investigate the running application's health and produce an evidence-based report, detecting the same memory pattern you observed manually in Exercise 5.
+## 6.4 Analyze Memory Status Logs (Optional)
 
-Now shift from the deployment to the running application itself. Start by asking the agent what is running.
+> [!NOTE]
+> This section is **optional** — work through it if you have time or want to deepen your log analysis skills. It introduces DQL (Dashboards Query Language) for free-text search and shows how to edit filters as raw OpenSearch Query DSL for more powerful matching. These are exactly the kinds of queries the AI agent constructs programmatically in Exercise 5.
 
-💬 **Prompt:**
-```
-hey Joule! Please list my apps.
-```
+**Learning Objective**: Use DQL to search application logs for runtime health data, then refine a filter using OpenSearch Query DSL to match all memory status entries — not just a single log line.
 
-The agent lists the Cloud Foundry applications in your production space — here a single app, **bookshop-srv** (Status: `STARTED`) — and offers to investigate its health. Follow up and ask for the analysis.
+The bookshop application periodically logs its memory consumption (RSS, Heap, Buffer). These entries are not errors, but they are valuable runtime health telemetry. In this section, you will locate and filter for them — first with a simple keyword search, then by crafting a Query DSL filter that matches the full pattern.
 
-💬 **Prompt:**
-```
-Can you please do an app health status analysis?
-```
 
-Using the SAP Automation Pilot application-operations commands, the agent collects evidence from several sources — application state, organization and space memory utilization, the app's allocated memory, its resident-memory (RSS) trend from SAP Cloud Logging, and recent error and memory-status log entries. It opens with an **Executive Summary** and a **Health Verdict** (⚠️ *Under Memory Pressure — Remediation Recommended*).
+#### Step 1. Search for Memory-Related Logs Using DQL
 
-<br><img src="images/ex06_05.png" />
+Back on the **Requests and Logs** dashboard (remove any active filters from the previous section), use the **DQL search bar** at the top of the dashboard to search for memory-related log entries.
 
-Scroll down to the agent's **Recommendation**. It proposes a concrete, justified action — increase the memory allocation by a specific amount — showing its calculation (current vs. proposed allocation, expected RSS utilization) and confirming the organization has enough free capacity to accommodate it. It also explicitly notes that scaling will **not** fix the application *data* errors.
+The search bar uses [Dashboards Query Language (DQL)](https://docs.opensearch.org/2.19/dashboards/dql/) — a simple text-based query language for filtering data in OpenSearch Dashboards. DQL supports free-text search, field-level filtering, and boolean operators.
 
-<br><img src="images/ex06_06.png" />
+**Actions to perform:**
 
-> **Tip — test the agent's judgement.** Ask it to look at the errors directly:
-> ```
-> ok, can you retrieve logs for the app errors?
-> ```
-> The agent returns an **Application Error Logs** report: a repeating pattern of **catalog data errors** (missing book IDs `8888` and `9999`), occurring at a steady frequency. A well-reasoned agent distinguishes these application **data** errors from genuine **memory pressure** — and will *not* recommend scaling to fix a data problem.
->
-> <br><img src="images/ex06_08.png" />
+1. Type `memory` in the search bar (①)
+2. Click **Refresh** (or press Enter) to apply the search (②)
+3. In the **Application Logs** panel, observe that the results now show only memory-related log entries (③)
+
+<br><img src="images/ex5_09.png" />
+
+*DQL search for "memory" — the Application Logs panel shows memory status entries*
+
+> [!TIP]
+> DQL searches across all text fields by default. You can also target specific fields, for example: `msg: memory` searches only the message field. See the [DQL reference](https://docs.opensearch.org/2.19/dashboards/dql/) for the full syntax.
+
+
+#### Step 2. Edit the Filter to Inspect the Query
+
+After the DQL search, you can create a precise filter from any log entry. In the **Application Logs** panel, hover over the `msg` column of one of the memory status entries — a small **+** icon ("Filter for value") appears on the right side of the field. Click it to add the exact message as a filter pill below the search bar (e.g., `msg: Memory status - RSS: 395MB, Heap: 32MB, Buffer: 300MB`).
+
+This exact-match filter is too specific — it only matches log entries with those exact memory values. To see **all** memory status log entries regardless of the actual RSS/Heap/Buffer numbers, you need to edit the filter.
+
+**Actions to perform:**
+
+1. Hover over a memory status message in the `msg` column and click the **+** icon to create a filter
+2. Click on the resulting filter pill to open the filter actions menu, then click **Edit filter** (①)
+
+<br><img src="images/ex5_10.png" />
+
+*Filter actions menu — click "Edit filter" to modify the query*
+
+
+#### Step 3. Switch to OpenSearch Query DSL
+
+The filter editor opens showing the field, operator, and value in a form view. To write a more flexible query, switch to the raw query editor.
+
+**Actions to perform:**
+
+1. Click **Edit as Query DSL** (①) to switch from the form view to the raw OpenSearch Query DSL editor
+
+<br><img src="images/ex5_11.png" />
+
+*Filter editor — click "Edit as Query DSL" to access the raw query*
+
+
+#### Step 4. Broaden the Filter with a Prefix Query
+
+The Query DSL editor now shows the raw OpenSearch query — currently an exact `match_phrase` for one specific memory status line. Replace it with a `match_phrase_prefix` query that matches **all** memory status entries, regardless of the actual memory values.
+
+**Actions to perform:**
+
+1. Replace the existing query with the following `match_phrase_prefix` query (①):
+
+   ```json
+   {
+     "match_phrase_prefix": {
+       "msg": "Memory status - "
+     }
+   }
+   ```
+
+   This matches any log message that **starts with** `"Memory status - "`, capturing all variations of RSS, Heap, and Buffer values.
+
+2. Click **Save** to apply the updated filter (②)
+
+<br><img src="images/ex5_12.png" />
+
+*Query DSL editor — replace the exact match with a match_phrase_prefix query, then save*
+
+> [!TIP]
+> `match_phrase_prefix` is one of many OpenSearch query types. It works like `match_phrase` but treats the last term as a prefix, making it ideal for matching log lines that share a common beginning but vary in their details. You can find more query types in the [OpenSearch Query DSL documentation](https://docs.opensearch.org/2.19/query-dsl/).
+
+
+#### Step 5. Review All Memory Status Entries
+
+The dashboard now shows **all** memory status log entries — every periodic report of the application's RSS, Heap, and Buffer usage, regardless of the specific values.
+
+<br><img src="images/ex5_13.png" />
+
+*All memory status entries visible — the prefix query matches every "Memory status - ..." log line*
+
+These periodic memory reports give you a baseline view of the application's runtime health. In Exercise 5, the AI agent queried these same logs programmatically to assess memory trends and detect anomalies.
+
 
 #### Exercise Summary
 
-The agent independently gathered metrics and logs, detected the tight memory allocation, and produced a structured health report with a concrete, justified recommendation — matching the findings you made by hand in Exercise 5. It also correctly separated the data errors from the memory issue.
+**Result**: You used DQL free-text search to locate memory-related logs, then crafted a custom OpenSearch Query DSL filter to match all memory status entries using `match_phrase_prefix`.
+
+**Key Capabilities Demonstrated:**
+- ✅ **DQL search**: Using the search bar for free-text filtering across log fields
+- ✅ **Filter editing**: Modifying dashboard filters via the filter actions menu
+- ✅ **Query DSL**: Writing raw OpenSearch queries for more powerful, flexible matching
+- ✅ **Pattern-based filtering**: Using `match_phrase_prefix` to generalize exact-match filters
+
+**Further References:**
+- [Dashboards Query Language (DQL)](https://docs.opensearch.org/2.19/dashboards/dql/)
+- [OpenSearch Query DSL](https://docs.opensearch.org/2.19/query-dsl/)
+- [match_phrase_prefix Query](https://docs.opensearch.org/2.19/query-dsl/full-text/match-phrase-prefix/)
 
 ---
 
-## Exercise 6.4 - Apply a Recommended Fix
-
-**Learning Objective**: Act on the agent's recommendation and let it scale the application, then confirm the result.
-
-Ask the agent to carry out the fix it recommended — increasing the application's allocated memory to the target it proposed in the previous step.
-
-💬 **Prompt:**
-```
-OK, let's upscale the app bookshop-srv memory to <target> MB.
-```
-
-The agent uses SAP Automation Pilot to increase the application's per-instance memory and restart it so the change takes effect. It returns an **Application Upscaling Complete** report with a before/after table of the memory allocation changes (per-instance memory, total reserved, instances) and the expected memory utilization after the restart.
-
-<br><img src="images/ex06_07.png" />
-
-💬 **Optional — verify the result:**
-```
-Check the application's memory and state again to confirm it recovered.
-```
-
-The agent re-runs the health checks and confirms the application is now running with more headroom and a healthier RSS-to-allocation ratio.
-
-#### Exercise Summary
-
-You applied the agent's recommendation through a single natural-language instruction. The agent scaled the application, restarted it, and verified the improved state — completing the remediation.
-
----
-
-## Exercise 6.5 - Look Behind the Scenes (Optional)
-
-**Learning Objective**: See that every agent action was a governed SAP Automation Pilot command, invoked through an MCP server — not a black box.
-
-Everything the agent did was backed by the commands you worked with in the earlier exercises, exposed to the agent through two **MCP servers** in SAP Automation Pilot. You can inspect them to see exactly which tools the agent had available and which ones it just ran.
-
-In **SAP Automation Pilot**, open **MCP Servers** (under *Execution Management*).
-
-The **`ctms-transport-remediation`** server exposes the transport tools — *Get Transport Health Report*, *…With Logs*, *Get Transport Request Health With Logs*, *Retry Transport Request*, *Get Transport Request Status*, and *Create Missing Service*. Its **Recent Executions** list shows the very calls your agent made during 6.1 and 6.2 (`get_transport_request_status`, `retry_transport_request`, `create_missing_service`), each run by your Joule service account.
-
-<br><img src="images/ex06_09.png" />
-
-The **`app-operations`** server exposes the application tools — *List Apps*, *Check Resource Utilization*, *Get App Allocated Memory*, *Get App Memory Trend*, *Get Cloud Logging Errors/Memory*, *Get App Logs Analysis*, and *Upscale App*. Its **Recent Executions** list shows the calls behind your 6.3 and 6.4 interactions (`get_app_logs_analysis`, `get_cloud_logging_errors`, `upscale_app`).
-
-<br><img src="images/ex06_10.png" />
-
-> **Note:** Read-only tools (marked *Read-Only*) only observe; the acting tools (*Create Missing Service*, *Retry Transport Request*, *Upscale App*) are the ones that change your landscape. This is how the agent stays **governed** — it can only do what these published commands allow.
-
-#### Exercise Summary
-
-You confirmed that the agent's behaviour maps one-to-one onto governed SAP Automation Pilot commands, invoked through MCP — the same commands you built and ran by hand in the earlier exercises.
-
----
-
-## Keep Playing — Prompts to Try
-
-The agent is yours to experiment with. There is no fixed script — try rephrasing, chaining requests, or deliberately testing its reasoning. A few ideas:
-
-**Explore the landscape**
-```
-Give me a full health report with logs for all my transport nodes.
-```
-```
-What is the current status of transport request <id>?
-```
-
-**Dig into the application**
-```
-What's the memory trend for bookshop-srv over the last 15 minutes?
-```
-```
-How much free memory does my organization have right now?
-```
-```
-Summarise the error patterns in my application logs.
-```
-
-**Test its judgement**
-```
-My app is logging errors — should I scale it up?
-```
-```
-Is it safe to upscale by another 512 MB? Does the org have room?
-```
-
-**Chain a full workflow in one go**
-```
-Check my transports, fix any failures, then do a health check on my app and recommend what to do next.
-```
-
-> **Tip:** Watch how the agent asks for confirmation before any action that changes your landscape (creating a service, retrying a transport, scaling the app), and how it refuses or pushes back when a request would not actually help — for example, scaling to "fix" the catalog data errors. That judgement, backed by governed automations, is the point of the exercise.
-
----
 
 ## Summary
 
-You have completed the full Day 2 operations cycle using a Joule AI agent: detected and diagnosed a transport failure, remediated it and confirmed success, performed an application health analysis, and applied a recommended fix — all through agent interaction backed by governed SAP Automation Pilot commands.
+You have completed a manual investigation of the bookshop application using SAP Cloud Logging. Your key findings:
 
-Throughout, the agent reasoned about *your* environment, chose the right automations, and kept you in control of the decisions — while handling the credentials, environment details, and command orchestration on your behalf.
+1. **HTTP 404 request errors** — the CF router logs show requests to endpoints that return 404 status codes
+2. **Application-level catalog errors** — the bookshop service repeatedly fails to find Book IDs 8888 and 9999, logging "Possible data migration issue"
+3. **Memory status telemetry** (optional) — periodic runtime health reports showing RSS, Heap, and Buffer usage
+
+Along the way, you learned to navigate pre-built CF dashboards, filter by log level, search with DQL, and write OpenSearch Query DSL filters — the same query techniques the AI agent uses programmatically in Exercise 5.
+
+You now have the operational understanding to evaluate what the AI agent reports — and to know when it gets it right.
 
 **Congratulations! You have successfully completed the hands-on session!**

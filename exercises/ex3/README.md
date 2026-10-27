@@ -8,7 +8,7 @@ In this exercise, you will see how the transport failure from Exercise 2 is dete
 
 #### Prerequisites
 
-You need access to your **source subaccount** (`XP260_T0XX`), where SAP Cloud Transport Management and SAP Alert Notification Service are set up for you. The ANS **condition** and **Store action** that capture the transport-failure event are **pre-configured** — you do not need to create them. If you need to sign in, follow the login instructions from the [General Section](../ex0/README.md).
+You need access to your **source subaccount** (`XP260_S0XX`), where SAP Cloud Transport Management and SAP Alert Notification Service are set up for you. The ANS **condition** and **Store action** that capture the transport-failure event are **pre-configured** — you do not need to create them. If you need to sign in, follow the login instructions from the [General Section](../ex0/README.md).
 
 ---
 
