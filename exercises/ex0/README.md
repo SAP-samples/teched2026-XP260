@@ -30,6 +30,6 @@ Replace `XX` with your seat number (e.g., `XP260_S001` for seat 01).
 
 ## Summary
 
-You have reviewed the bookshop application and the three-subaccount BTP landscape used in this hands-on.
+You have reviewed the bookshop application and the two-subaccount BTP landscape used in this hands-on.
 
 Continue to - [Exercise 1 - Export an Application with SAP Content Agent Service](../ex1/README.md)

@@ -220,7 +220,7 @@ With the wider time range, you can now see the full set of Cloud Foundry dashboa
 - **Requests and Logs** — detailed log analytics
 - **App Crash Detection** — application failure monitoring
 
-Feel free to explore any of these dashboards. For this exercise, we will focus on **Requests and Logs** to investigate the application errors.
+Feel free to explore any of these dashboards. For this exercise, focus on **Requests and Logs** to investigate the application errors.
 
 1. Optionally, explore the **Top Apps** (①) and **Four Golden Signals** (②) dashboards to see per-application KPIs and the standard latency/traffic/errors/saturation metrics.
 2. Click on **Requests and Logs** (③) in the navigation bar.
@@ -297,7 +297,7 @@ To return to the unfiltered view, click the **level.keyword: error** filter pill
 *Application logs filtered by error level — showing the "Book ID not found" pattern*
 
 > [!IMPORTANT]
-> Remember these error patterns. In Exercise 5, the Joule agent detected and reported exactly these findings — now you can see what they look like in the raw log data.
+> These are the exact error patterns the Joule agent detected and reported in Exercise 5 — `[Catalog] Book ID 8888 not found` and `[Catalog] Book ID 9999 not found`. You are now seeing the raw log data behind the agent's findings.
 
 
 #### Exercise Summary

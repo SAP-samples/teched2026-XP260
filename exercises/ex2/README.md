@@ -57,7 +57,7 @@ You need access to your **source subaccount** (`XP260_S0XX`), where SAP Cloud Tr
 
 1. In the landscape diagram, click the **Target** node to select it.
 
-2. Click the import queue icon on the **Target** node to open its import queue.
+2. Click the **Action** icon (<img src="images/action-icon.svg" alt="Action icon" width="16" height="16" style="vertical-align:middle"/>) in the top-right corner of the **Target** node to open its import queue.
 
    <br><img src="images/ex2_02.png" alt="Import queue icon on the Target node" />
 
