@@ -8,7 +8,7 @@ In this exercise, you will use SAP Automation Pilot to create a remediation comm
 
 You will compose your command on top of the SAP-provided command  **`CreateCfServiceInstance`**, which creates a service instance in a Cloud Foundry space. Your finished command, **`XP260CreateDestination`**, is a thin wrapper that pre-fills the destination-specific values and injects your environment and credentials, so that at run time you only supply the instance name.
 
-> **Context:** SAP Automation Pilot organizes automations into **catalogs** of **commands**. A command is built from one or more **executors** (reusable building blocks). Reusable values such as credentials and your target environment are stored once as **inputs** and referenced by commands , so you never paste secrets into a command definition. In this exercise these inputs are **pre-configured for you**.
+> **Context:** SAP Automation Pilot organizes automations into **catalogs** of **commands**. A command is built from one or more **executors** (reusable building blocks). Reusable values such as credentials and your target environment are stored once as **inputs** and referenced by commands, so you never paste secrets into a command definition. In this exercise these inputs are **pre-configured for you**.
 
 #### Step 1. Review the Pre-Configured Inputs
 
@@ -92,7 +92,7 @@ Add **`region`** and **`space`** the same way, both bound to **`targetEnvironmen
 When done, your Input Keys show each binding — `org`, `region`, `space` from **targetEnvironment**, and `user`, `password` from **techUser**:
 <br><img src="images/ex04-00-07.png" />
 
-> **Note:** Binding an input key's default to a stored input is what lets the command run **without** you typing credentials or environment details — exactly the pattern a Joule AI agent relies on in Exercise 6.
+> **Note:** Binding an input key's default to a stored input is what lets the command run **without** you typing credentials or environment details — exactly the pattern a Joule AI agent relies on in Exercise 5.
 
 #### Step 4. Add the Executor (with Automap)
 
@@ -137,11 +137,11 @@ Your command is now complete and ready. The **Input Keys** show every binding, a
 
 <br><img src="images/ex04-01_19-v2.png" />
 
-> **Note:** Your command is functionally equivalent to the reference command `XP260CreateDestination`: a one-executor wrapper around `CreateCfServiceInstance` provided command in SAP Automation Pilot which is not configured to provisions the `destination` service with plan `lite` , with everything except `instanceName` (that is to be defined dynamically at the moment the command runs), all resolved automatically from the stored inputs.
+> **Note:** Your command is functionally equivalent to the reference command `XP260CreateDestination`: a one-executor wrapper around the provided `CreateCfServiceInstance` command in SAP Automation Pilot, configured to provision the `destination` service with plan `lite`, with everything except `instanceName` (that is to be defined dynamically at the moment the command runs), all resolved automatically from the stored inputs.
 
 #### Exercise Summary
 
-You created a reusable remediation command from scratch: you reviewed the pre-configured inputs, added the `CreateCfServiceInstance` executor with Automap, declared the input keys and bound them to the `targetEnvironment` and `techUser` inputs, and set the fixed `plan`/`service` values. .
+You created a reusable remediation command from scratch: you reviewed the pre-configured inputs, added the `CreateCfServiceInstance` executor with Automap, declared the input keys and bound them to the `targetEnvironment` and `techUser` inputs, and set the fixed `plan`/`service` values.
 
 ## Exercise 4.2 - A Command to Repeat the Deployment
 
@@ -185,7 +185,7 @@ The new command opens with an empty **Contract**. Choose **Add** under **Input K
 **`nodeId`** — the transport node. **Name** `nodeId`, **Type** `number`, **Required** on.
 <br><img src="images/ex04-02_06.png" />
 
-**`serviceKey`** — the cTMS credentials. **Name** `serviceKey`, **Type** `object`, **Sensitive** on, **Default Value Source: Input Key**, and map it tp **Input: `cTMS`**, **Input Key: `serviceKey`**.
+**`serviceKey`** — the cTMS credentials. **Name** `serviceKey`, **Type** `object`, **Sensitive** on, **Default Value Source: Input Key**, and map it to **Input: `cTMS`**, **Input Key: `serviceKey`**.
 <br><img src="images/ex04-02_07.png" />
 
 #### Step 3. Add the Output Key
@@ -230,28 +230,28 @@ Your command is now complete — inputs, output mapping, and the executor all in
 
 ### 4.2.2 - Check the Automations in Place
 
-Now we have the following commands .
+Now we have the following commands.
 
 #### Command 1: Provision the Missing Destination Service
 
 1. Open your **`XP260CreateDestination`** command (from Exercise 4.1) 
 
 
-#### Coomand 2: Retrigger the Transport Request
+#### Command 2: Retrigger the Transport Request
 
-1. Open your **`XP260RetryTransport`**  commad (from Exercise 4.2)
+1. Open your **`XP260RetryTransport`** command (from Exercise 4.2)
 
-IMPORTAN: You'll use these command in an agentic manner, as an AI Day 2 Operations Agent will be consuming them. This is why you are not triggering them now. 
+IMPORTANT: You'll use these commands in an agentic manner, as an AI Day 2 Operations Agent will be consuming them. This is why you are not triggering them now.
 
-> **Note:** If you want run the commands later via SAP Automation Pilot to  the issue - **order matters** — provision the Destination service **first**. Retrying the transport before the missing service exists will simply fail again with the same error.
+> **Note:** If you want to run the commands later via SAP Automation Pilot to fix the issue - **order matters** — provision the Destination service **first**. Retrying the transport before the missing service exists will simply fail again with the same error.
 
 #### Exercise Summary
 
-You built a second command from scratch using only a provided cTMS building block, with a `transportRequestIds` array, a `nodeId`, and an injected service key. You are all set to use the commands with an AI Ops Agent to provisioning the missing service, reading the failed transport's ids from the stored alert, and re-importing the transport — and confirmed a successful deployment with a running application.
+You built a second command from scratch using only a provided cTMS building block, with a `transportRequestIds` array, a `nodeId`, and an injected service key. You are all set to use the commands with an AI Ops Agent to provision the missing service, reading the failed transport's ids from the stored alert, and re-importing the transport — and confirmed a successful deployment with a running application.
 
 ## Exercise 4.3 - Expose the Automation through MCP
 
-**Learning Objective**: Understand what the Model Context Protocol (MCP) is, how SAP Automation Pilot exposes commands as MCP tools, and build your own MCP server that publishes the two commands you created — ready for a Joule AI agent to discover and invoke in Exercise 6.
+**Learning Objective**: Understand what the Model Context Protocol (MCP) is, how SAP Automation Pilot exposes commands as MCP tools, and build your own MCP server that publishes the two commands you created — ready for a Joule AI agent to discover and invoke in Exercise 5.
 
 ### What is MCP?
 
@@ -274,13 +274,13 @@ Each **tool** maps one Automation Pilot command to an agent-callable capability:
 
 | Tool field | Purpose |
 |------------|---------|
-| **Command** | The command to expose, e.g. `<XP260CreateDestination`. |
+| **Command** | The command to expose, e.g. `XP260CreateDestination`. |
 | **Name** | Snake_case name the agent sees, e.g. `create_destination` (max 32 characters). |
 | **Title** | Human-readable Title Case label, e.g. `Create Destination`. |
 | **Status Enabled** | Whether this individual tool is active. |
 | **Input References** | Stored inputs injected at run time (credentials, environment) so the agent never supplies secrets. |
 | **Read-Only** | `enabled` for read-only tools; `false` for tools that change state. |
-| **Destructivet** | `enabled` only for tools that delete or irreversibly change state. |
+| **Destructive** | `enabled` only for tools that delete or irreversibly change state. |
 | **Idempotent** | `enabled` for write tools that are safe to repeat. |
 
 
@@ -375,11 +375,11 @@ The **MCP Endpoint** (top of the server page, next to **Copy**) is the URL an MC
 
 <br><img src="images/ex04-03_08.png" />
 
-> **Hint:** You will not call this endpoint by hand here — in **Exercise 6**, a pre-configured Joule agent is already connected to MCP servers like this one and will invoke `createdDest` and `retryTransport` on your behalf through natural-language prompts.
+> **Hint:** You will not call this endpoint by hand here — in **Exercise 5**, a pre-configured Joule agent is already connected to MCP servers like this one and will invoke `createdDest` and `retryTransport` on your behalf through natural-language prompts.
 
 #### Exercise Summary
 
-You published your two commands as MCP tools on an MCP server, with runbook-style instructions, injected credentials, and honest safety hints. This is the standardised interface through which a Joule AI agent discovers and executes your governed automations — the bridge from Automation Pilot commands to AI-assisted operations in Exercise 6.
+You published your two commands as MCP tools on an MCP server, with runbook-style instructions, injected credentials, and honest safety hints. This is the standardised interface through which a Joule AI agent discovers and executes your governed automations — the bridge from Automation Pilot commands to AI-assisted operations in Exercise 5.
 
 ## (Optional) Exercise 4.4 - Retrieve Application Logs from SAP Cloud Logging
 
@@ -387,7 +387,7 @@ You published your two commands as MCP tools on an MCP server, with runbook-styl
 
 So far your commands *change* the landscape (create a service, retry a transport). This one *observes* it: it reads recent logs for your application from **SAP Cloud Logging**, the observability service that collects your application's output.
 
-> **Deep dive:** This exercise only scratches the surface of SAP Cloud Logging — just enough to retrieve logs through a command. You will explore Cloud Logging in depth, navigating its dashboards and investigating error patterns yourself, in [Exercise 5 - Explore Application Logs with SAP Cloud Logging](../ex5/README.md).
+> **Deep dive:** This exercise only scratches the surface of SAP Cloud Logging — just enough to retrieve logs through a command. You will explore Cloud Logging in depth, navigating its dashboards and investigating error patterns yourself, in [Exercise 6 - Explore Application Logs with SAP Cloud Logging](../ex6/README.md).
 
 #### Step 1. Open the SAP Cloud Logging Catalog
 
@@ -422,7 +422,7 @@ The **serviceKey** shows it is taken from your `CLS` input. Choose **Trigger**.
 
 <br><img src="images/ex04-04_05.png" />
 
-> **Note:** `GetLogs` also accepts an optional **query** input (an OpenSearch DSL clause) to narrow results — for example by application or log level. You can add one once you have seen the log structure in Exercise 5.
+> **Note:** `GetLogs` also accepts an optional **query** input (an OpenSearch DSL clause) to narrow results — for example by application or log level. You can add one once you have seen the log structure in Exercise 6.
 
 #### Step 5. Consume the Output
 
@@ -442,7 +442,7 @@ Expand **hits** to see the raw log documents — note fields like `app_name` (`b
 
 <br><img src="images/ex04-04_08.png" />
 
-> **Note:** These are the same log entries you will investigate interactively in Exercise 5, and that a Joule agent reads programmatically in Exercise 6.
+> **Note:** These are the same log entries you will investigate interactively in Exercise 6, and that a Joule agent reads programmatically in Exercise 5.
 
 ### From One Log Command to an Observability Toolset
 
@@ -454,6 +454,6 @@ You ran a provided SAP Cloud Logging command, injected the Cloud Logging credent
 
 ## Summary
 
-You have built a r**eusable remediation automation in SAP Automation Pilot** to fix the Destination service dependency and retry a Transport Request Import to confirmed a successful deployment. The automation is now ready to be invoked by a Joule AI agent in Exercise 6.
+You have built a **reusable remediation automation in SAP Automation Pilot** to fix the Destination service dependency and retry a Transport Request Import to confirm a successful deployment. The automation is now ready to be invoked by a Joule AI agent in Exercise 5.
 
-Continue to - [Exercise 5 - Explore Application Logs with SAP Cloud Logging](../ex5/README.md)
+Continue to - [Exercise 5 - AI Agent for Day 2 Operations with Joule](../ex5/README.md)

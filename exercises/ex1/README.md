@@ -77,7 +77,7 @@ You need access to your **source subaccount** (`XP260_S0XX`). If you need to sig
 
    *Selecting capire.bookshop_1.0.0.mtar for export*
 
-4. On **Step 2** and **Step 3**, keep the default settings and proceed to **Step 4**.
+4. On **Step 2** (Dependency Details) and **Step 3** (Export Options), keep the default settings and proceed to **Step 4**.
 
 5. On **Step 4 – Export Details**, configure the transport request:
    1. Click **Select Options** next to the transport destination and choose the **Dev** node.

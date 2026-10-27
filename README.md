@@ -16,12 +16,12 @@ Find below a scenario description and links to all exercise material.
 
 ## Introduction and Scenario Overview
 
-Workshop overview is shared below covering main interactions: export and transport the app, capture failure events and pperate it through governed commands.
+Workshop overview is shared below covering main interactions: export and transport the app, capture failure events and operate it through governed commands.
 ![Architecture diagram](images/xp260-workshop-architecture.png)
 
 ### Scenario Solution Overview 
 
-See the architecture diagram to uderstad all interactionsn and how compoents fit together in an end-to-end scenario. 
+See the architecture diagram to understand all interactions and how components fit together in an end-to-end scenario.
 ![Architecture diagram](images/xp260-workshop-architecture-deep-dive.png)
 
 **A production deployment. A deliberate failure. Can you fix it — and automate the fix?**
@@ -32,7 +32,7 @@ As a DevOps engineer, you have a CAP bookshop application ready for deployment o
 - It intentionally generates **increasing RSS memory consumption** and writes **recurring catalog error logs** for book IDs that do not exist in the database — giving you realistic operational signals to investigate and remediate.
 
 **Your Mission:**
-Work through the complete operational lifecycle: export and transport the application, watch the deployment fail, detect the failure automatically, build a remediation automation, investigate the logs manually, and finally hand all of it to a Joule AI agent to repeat agentically.
+Work through the complete operational lifecycle: export and transport the application, watch the deployment fail, detect the failure automatically, build a remediation automation, hand it all to a Joule AI agent to deploy and operate agentically, and finally investigate the underlying logs manually to understand what the agent found.
 
 **What You'll Champion:**
 
@@ -45,8 +45,8 @@ The hands-on has two parts: first you get the application deployed (Exercises 0�
 - **[Exercise 2](exercises/ex2/README.md): Import a Transport Request with SAP Cloud Transport Management** — Trigger the deployment and watch it fail with a **Fatal** status because the required Destination service binding is missing.
 - **[Exercise 3](exercises/ex3/README.md): Detect the Failure Automatically with SAP Alert Notification Service** — See how the transport failure event is delivered automatically through SAP Alert Notification Service, eliminating the need for manual queue monitoring.
 - **[Exercise 4](exercises/ex4/README.md): Build an Automated Remediation with SAP Automation Pilot** — Create a reusable command that provisions the missing Destination service and retriggers the transport. Optionally expose it through MCP.
-- **[Exercise 5](exercises/ex5/README.md): Explore Application Logs with SAP Cloud Logging** — The application is now running in the target subaccount. Navigate the pre-built Cloud Foundry dashboards in SAP Cloud Logging and manually identify the HTTP errors and catalog error patterns the AI agent will later detect programmatically.
-- **[Exercise 6](exercises/ex6/README.md): AI Agent for Day 2 Operations with Joule** — Hand the operational tasks to a Joule AI agent. The agent triggers deployments, detects failures, runs remediations, performs application health analyses, and applies a recommended fix — all through agent interaction backed by the SAP Automation Pilot commands you built.
+- **[Exercise 5](exercises/ex5/README.md): AI Agent for Day 2 Operations with Joule** — Hand the operational tasks to a Joule AI agent. The agent detects failures, runs remediations, performs application health analyses, and applies a recommended fix — all through natural-language interaction backed by the SAP Automation Pilot commands you built.
+- **[Exercise 6](exercises/ex6/README.md): Explore Application Logs with SAP Cloud Logging** — The application is running in the target subaccount. Navigate the pre-built Cloud Foundry dashboards in SAP Cloud Logging and manually explore the same HTTP errors and catalog error patterns the AI agent detected in Exercise 5.
 
 **The Outcome:**
 Walk away with a working end-to-end blueprint: GitHub → Cloud Transport Management → failure detection → Automation Pilot remediation → MCP → Joule Agent → Cloud Logging investigation → application health analysis → remediation. These services do not operate in isolation — together they deliver governed cloud delivery with event-driven automation and AI-assisted operations.
@@ -72,15 +72,15 @@ Walk away with a working end-to-end blueprint: GitHub → Cloud Transport Manage
 
 ### Part 2 — Operate the Running Application
 
-- [Exercise 5 - Explore Application Logs with SAP Cloud Logging](exercises/ex5/README.md)
-  - [Exercise 5.1 - Open the Bookshop Application](exercises/ex5/README.md#51-open-the-bookshop-application)
-  - [Exercise 5.2 - Navigate to SAP Cloud Logging](exercises/ex5/README.md#52-navigate-to-sap-cloud-logging)
-  - [Exercise 5.3 - Investigate Application Errors](exercises/ex5/README.md#53-investigate-application-errors)
-- [Exercise 6 - AI Agent for Day 2 Operations with Joule](exercises/ex6/README.md)
-  - [Exercise 6.1 - Repeat the Deployment Agentically](exercises/ex6/README.md#exercise-61---repeat-the-deployment-agentically)
-  - [Exercise 6.2 - Let the Agent Remediate the Problem](exercises/ex6/README.md#exercise-62---let-the-agent-remediate-the-problem)
-  - [Exercise 6.3 - Perform an Application Health Analysis](exercises/ex6/README.md#exercise-63---perform-an-application-health-analysis)
-  - [Exercise 6.4 - Apply a Recommended Fix](exercises/ex6/README.md#exercise-64---apply-a-recommended-fix)
+- [Exercise 5 - AI Agent for Day 2 Operations with Joule](exercises/ex5/README.md)
+  - [Exercise 5.1 - Detect and Diagnose the Failure Agentically](exercises/ex5/README.md#51-detect-and-diagnose-the-failure-agentically)
+  - [Exercise 5.2 - Let the Agent Remediate the Problem](exercises/ex5/README.md#52-let-the-agent-remediate-the-problem)
+  - [Exercise 5.3 - Perform an Application Health Analysis](exercises/ex5/README.md#53-perform-an-application-health-analysis)
+  - [Exercise 5.4 - Apply a Recommended Fix](exercises/ex5/README.md#54-apply-a-recommended-fix)
+- [Exercise 6 - Explore Application Logs with SAP Cloud Logging](exercises/ex6/README.md)
+  - [Exercise 6.1 - Open the Bookshop Application](exercises/ex6/README.md#61-open-the-bookshop-application)
+  - [Exercise 6.2 - Navigate to SAP Cloud Logging](exercises/ex6/README.md#62-navigate-to-sap-cloud-logging)
+  - [Exercise 6.3 - Investigate Application Errors](exercises/ex6/README.md#63-investigate-application-errors)
 
 ## Prerequisites
 
