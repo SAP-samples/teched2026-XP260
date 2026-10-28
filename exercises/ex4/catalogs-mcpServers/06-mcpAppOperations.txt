@@ -1,0 +1,140 @@
+{
+  "name": "app-operations",
+  "enabled": true,
+  "instructions": "MCP server for investigating and remediating the health of Cloud Foundry applications on SAP BTP.\n\nUse this server to run an application health investigation:\n- **Discover**: call `list_apps` first to see which applications exist and their current state (STARTED/STOPPED).\n- **Resource pressure**: call `check_resource_utilization` for org and space memory usage, both as percentages and absolute MB (used vs. quota). Call `get_app_allocated_memory` for how much memory the app reserves.\n- **Memory trend**: call `get_app_memory_trend` to see whether the app's resident memory (RSS) is climbing over the last 15 minutes.\n- **Logs**: call `get_app_logs_analysis` for app state, events and recent logs together; or `get_cloud_logging_errors` for error-level log entries and `get_cloud_logging_memory` for raw memory-status log lines.\n- **Remediate**: when the app is under memory pressure, call `upscale_app` to add memory (default +256 MB) and restart it.\n\nTo produce an application health report, combine list_apps + check_resource_utilization + get_app_memory_trend + get_cloud_logging_errors, then synthesise state, resource pressure and error patterns into a verdict with a recommendation. Only upscale when memory is genuinely the bottleneck - repeated application errors (e.g. 'not found') are data issues that scaling will not fix.\n\nTarget environment (region, space, organization) and all credentials are injected automatically; you do not need to supply them.",
+  "mcpTools": [
+    {
+      "commandId": "03XP260-<<<TENANT_ID>>>:ListApps:1",
+      "name": "list_apps",
+      "enabled": true,
+      "inputReferences": [
+        "01XP260-<<<TENANT_ID>>>:techUser:1",
+        "01XP260-<<<TENANT_ID>>>:targetEnvironment:1"
+      ],
+      "tags": {},
+      "title": "List Apps",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "03XP260-<<<TENANT_ID>>>:CheckResourceUtilization:1",
+      "name": "check_resource_utilization",
+      "enabled": true,
+      "inputReferences": [
+        "01XP260-<<<TENANT_ID>>>:techUser:1",
+        "01XP260-<<<TENANT_ID>>>:targetEnvironment:1"
+      ],
+      "tags": {},
+      "title": "Check Resource Utilization",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "03XP260-<<<TENANT_ID>>>:GetAppAllocatedMemory:1",
+      "name": "get_app_allocated_memory",
+      "enabled": true,
+      "inputReferences": [
+        "01XP260-<<<TENANT_ID>>>:techUser:1",
+        "01XP260-<<<TENANT_ID>>>:targetEnvironment:1"
+      ],
+      "tags": {},
+      "title": "Get App Allocated Memory",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "03XP260-<<<TENANT_ID>>>:GetAppMemoryTrend:1",
+      "name": "get_app_memory_trend",
+      "enabled": true,
+      "inputReferences": [
+        "03XP260-<<<TENANT_ID>>>:CLS:1"
+      ],
+      "tags": {},
+      "title": "Get App Memory Trend",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "03XP260-<<<TENANT_ID>>>:GetCloudLoggingErrors:1",
+      "name": "get_cloud_logging_errors",
+      "enabled": true,
+      "inputReferences": [
+        "03XP260-<<<TENANT_ID>>>:CLS:1"
+      ],
+      "tags": {},
+      "title": "Get Cloud Logging Errors",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "03XP260-<<<TENANT_ID>>>:GetCloudLoggingMemory:1",
+      "name": "get_cloud_logging_memory",
+      "enabled": true,
+      "inputReferences": [
+        "03XP260-<<<TENANT_ID>>>:CLS:1"
+      ],
+      "tags": {},
+      "title": "Get Cloud Logging Memory",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "03XP260-<<<TENANT_ID>>>:GetAppLogsAnalysis:1",
+      "name": "get_app_logs_analysis",
+      "enabled": true,
+      "inputReferences": [
+        "01XP260-<<<TENANT_ID>>>:techUser:1",
+        "01XP260-<<<TENANT_ID>>>:targetEnvironment:1"
+      ],
+      "tags": {},
+      "title": "Get App Logs Analysis",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "03XP260-<<<TENANT_ID>>>:UpscaleApp:1",
+      "name": "upscale_app",
+      "enabled": true,
+      "inputReferences": [
+        "01XP260-<<<TENANT_ID>>>:techUser:1",
+        "01XP260-<<<TENANT_ID>>>:targetEnvironment:1"
+      ],
+      "tags": {},
+      "title": "Upscale App",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "sync": false,
+      "waitTimeSeconds": null
+    }
+  ]
+}

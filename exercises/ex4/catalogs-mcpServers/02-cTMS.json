@@ -1,0 +1,2149 @@
+{
+  "id": "02XP260-<<<TENANT_ID>>>",
+  "technicalName": "02XP260",
+  "name": "02-CTMS",
+  "description": "",
+  "owner": "<<<TENANT_ID>>>",
+  "tags": {},
+  "documentationUrl": null,
+  "inputs": [
+    {
+      "id": "02XP260-<<<TENANT_ID>>>:cTMS:1",
+      "name": "cTMS",
+      "description": "Inputs needed to authenticate to cTMS instance, including Service Keys",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "owner": null,
+      "version": 1,
+      "keys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "description": "Service Key generated to authenticate and perform actions to cTMS instance."
+        }
+      },
+      "values": {
+        "serviceKey": ""
+      },
+      "tags": {}
+    }
+  ],
+  "commands": [
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "actionId": "$(if (.execution.input.tmsUser | length) == 0 then .importRequestNoUser.output.actionId else .importRequestWithUser.output.actionId end)"
+        },
+        "executors": [
+          {
+            "execute": "ctms-sapcp:ImportTransportRequests:1",
+            "input": {
+              "transportRequestIds": "$([.execution.input.transportRequestId])",
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)"
+            },
+            "alias": "importRequestNoUser",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.tmsUser | length)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ImportTransportRequests:1",
+            "input": {
+              "transportRequestIds": "$([.execution.input.transportRequestId])",
+              "tmsUser": "$(.execution.input.tmsUser)",
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)"
+            },
+            "alias": "importRequestWithUser",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.tmsUser | length)",
+                      "operator": "NOT_EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:CTMSImportRequest:1",
+      "name": "CTMSImportRequest",
+      "description": "[internal helper - used by other cTMS commands] Import a single transport request in Cloud Transport Management service for a given transport node",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the transport request to import"
+        },
+        "tmsUser": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "",
+          "defaultValueFromInput": null,
+          "description": "User displayed in Cloud Transport Management UI that the action will be attributed to. If not provided, the authentication user will be shown in Cloud Transport Management UI."
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service Key for Cloud Transport Management service"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the node for which to import the transport request"
+        }
+      },
+      "outputKeys": {
+        "actionId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "The ID of the triggered import action"
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "org": "$(.extract.output.org)",
+          "serviceInstance": "$(.create.output.serviceInstance)",
+          "serviceInstanceName": "$(.create.output.serviceInstanceName)",
+          "region": "$(.extract.output.region)",
+          "space": "$(.extract.output.space)"
+        },
+        "executors": [
+          {
+            "execute": "02XP260-<<<TENANT_ID>>>:ExtractDeploymentTarget:1",
+            "input": {
+              "transportRequestId": "$(.execution.input.transportRequestId)",
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "extract",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "01XP260-<<<TENANT_ID>>>:CreateService:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "org": "$(.extract.output.org)",
+              "instanceName": "$(.execution.input.instanceName)",
+              "region": "$(.extract.output.region)",
+              "user": "$(.execution.input.user)",
+              "space": "$(.extract.output.space)"
+            },
+            "alias": "create",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:CreateMissingService:1",
+      "name": "CreateMissingService",
+      "description": "Creates a missing Cloud Foundry service instance in the org and space where a failed transport was deploying. Give it the failed transport request id and the name of the missing service instance (e.g. 'bookshop-dest'); it discovers the target org, space and region from the transport logs and creates the service there. Use this to remediate a transport that failed because a required service instance did not exist, before retrying. No node id, org, space or region needed - all resolved automatically.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Password of the SAP BTP account used to create the service instance."
+        },
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "The numeric id of the failed transport request whose target org/space/region the service should be created in (e.g. 535)."
+        },
+        "instanceName": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Name of the service instance to create, i.e. the service reported as missing in the transport logs (e.g. 'bookshop-dest')."
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Transport Management service instance."
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "User id / email of the SAP BTP account used to create the service instance."
+        }
+      },
+      "outputKeys": {
+        "org": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Cloud Foundry organization resolved from the transport logs, where the service was created."
+        },
+        "serviceInstance": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Details of the created service instance."
+        },
+        "serviceInstanceName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of the created service instance."
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "description": "SAP BTP region resolved from the transport logs."
+        },
+        "space": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Cloud Foundry space resolved from the transport logs, where the service was created."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "found": "$(.inspect.output.found)",
+          "transportRequestId": "$(.execution.input.transportRequestId)",
+          "org": "$(.inspect.output.logs | last | .entities | last | .messages | map(.message) | map(select(startswith(\"Deploying in org\"))) | .[0] // \"\" | split(\"\\\"\") | .[1] // \"\")",
+          "region": "$(.inspect.output.logs | last | .messages | map(.message) | map(select(contains(\"deploy-service.cf.\"))) | .[0] // \"\" | split(\"deploy-service.cf.\") | .[1] // \"\" | split(\".hana\") | .[0] // \"\" | \"cf-\" + .)",
+          "space": "$(.inspect.output.logs | last | .entities | last | .messages | map(.message) | map(select(startswith(\"Deploying in org\"))) | .[0] // \"\" | split(\"\\\"\") | .[3] // \"\")"
+        },
+        "executors": [
+          {
+            "execute": "02XP260-<<<TENANT_ID>>>:GetTransportRequestHealthWithLogs:1",
+            "input": {
+              "transportRequestId": "$(.execution.input.transportRequestId)",
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "inspect",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:ExtractDeploymentTarget:1",
+      "name": "ExtractDeploymentTarget",
+      "description": "Given a transport request id, inspects its deployment logs and extracts the Cloud Foundry target coordinates: organization name, space name, and region (e.g. cf-eu10-005). Use this to discover WHERE a failed transport was deploying, so a missing service instance can be created in the correct org/space/region before retrying. Requires no node id.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "The numeric id of the transport request whose deployment target should be extracted (e.g. 535)."
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Transport Management service instance."
+        }
+      },
+      "outputKeys": {
+        "found": {
+          "type": "boolean",
+          "sensitive": false,
+          "description": "Whether the transport request was located and its logs read."
+        },
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "The transport request id that was inspected."
+        },
+        "org": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Cloud Foundry organization (display name) the transport was deploying into. Feed this into CreateService 'org'."
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Technical SAP BTP region derived from the deploy service URI, e.g. cf-eu10-005. Feed this into CreateService 'region'."
+        },
+        "space": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Cloud Foundry space (display name) the transport was deploying into. Feed this into CreateService 'space'."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "found": "$(((.listFatal.output.transportRequests + .listError.output.transportRequests) | map(.id) | filter(. == $.execution.input.transportRequestId) | length) > 0)",
+          "actionId": "$(.importIfFound.output.actionId // 0)",
+          "nodeId": "$(.execution.input.nodeId)"
+        },
+        "executors": [
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Fatal"
+            },
+            "alias": "listFatal",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Error"
+            },
+            "alias": "listError",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "02XP260-<<<TENANT_ID>>>:CTMSImportRequest:1",
+            "input": {
+              "transportRequestId": "$(.execution.input.transportRequestId)",
+              "tmsUser": "$(.execution.input.tmsUser)",
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)"
+            },
+            "alias": "importIfFound",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$((.listFatal.output.transportRequests + .listError.output.transportRequests) | map(.id) | filter(. == $.execution.input.transportRequestId) | length)",
+                      "operator": "NOT_EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:FindAndImportInNode:1",
+      "name": "FindAndImportInNode",
+      "description": "[internal helper - used by other cTMS commands] Helper: checks if a transport request exists in a given node (Fatal/Error) and imports it if found. Used by RetryTransportRequestByIdAnyNode.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the transport request to look for and import"
+        },
+        "tmsUser": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "",
+          "defaultValueFromInput": null,
+          "description": "User displayed in Cloud Transport Management UI that the action will be attributed to."
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service Key for Cloud Transport Management service"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the node to check"
+        }
+      },
+      "outputKeys": {
+        "found": {
+          "type": "boolean",
+          "sensitive": false,
+          "description": "Whether the transport request was found in this node"
+        },
+        "actionId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "ID of the triggered import action, if the TR was found and imported"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "ID of the node that was checked"
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "found": "$((.listRunning.output.transportRequests + .listInitial.output.transportRequests + .listRepeatable.output.transportRequests + .listSucceeded.output.transportRequests + .listSkipped.output.transportRequests + .listWarning.output.transportRequests + .listError.output.transportRequests + .listFatal.output.transportRequests) | filter(.id == $.execution.input.transportRequestId) | length > 0)",
+          "transportRequest": "$((.listRunning.output.transportRequests + .listInitial.output.transportRequests + .listRepeatable.output.transportRequests + .listSucceeded.output.transportRequests + .listSkipped.output.transportRequests + .listWarning.output.transportRequests + .listError.output.transportRequests + .listFatal.output.transportRequests) | filter(.id == $.execution.input.transportRequestId) | .[0] // {})",
+          "nodeId": "$(.execution.input.nodeId)",
+          "status": "$((.listRunning.output.transportRequests + .listInitial.output.transportRequests + .listRepeatable.output.transportRequests + .listSucceeded.output.transportRequests + .listSkipped.output.transportRequests + .listWarning.output.transportRequests + .listError.output.transportRequests + .listFatal.output.transportRequests) | filter(.id == $.execution.input.transportRequestId) | .[0].status // \"\")"
+        },
+        "executors": [
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Running"
+            },
+            "alias": "listRunning",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Initial"
+            },
+            "alias": "listInitial",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Repeatable"
+            },
+            "alias": "listRepeatable",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Succeeded"
+            },
+            "alias": "listSucceeded",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Skipped"
+            },
+            "alias": "listSkipped",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Warning"
+            },
+            "alias": "listWarning",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Error"
+            },
+            "alias": "listError",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Fatal"
+            },
+            "alias": "listFatal",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:FindTransportRequestInNode:1",
+      "name": "FindTransportRequestInNode",
+      "description": "[internal helper - used by other cTMS commands] Helper: searches a single node across all statuses for a transport request by ID and returns it if found. Used by GetTransportRequestStatus.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the transport request to look for"
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service Key for Cloud Transport Management service"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the node to search"
+        }
+      },
+      "outputKeys": {
+        "found": {
+          "type": "boolean",
+          "sensitive": false,
+          "description": "Whether the transport request was found in this node"
+        },
+        "transportRequest": {
+          "type": "object",
+          "sensitive": false,
+          "description": "The full transport request object, if found"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "ID of the node that was searched"
+        },
+        "status": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Status of the transport request, if found"
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "transportRequestName": "$(.getLogs.output.body | toObject | .logs[0].messages[0].message | split(\"transport request '\") | .[1] | split(\"'\") | .[0] // \"\")",
+          "actionStatus": "$(.getLogs.output.body | toObject | .logs[0].status // \"\")",
+          "lastMessage": "$(.getLogs.output.body | toObject | .logs[0].entities[0].messages[-1].message | rtrimstr(\" \") | rtrimstr(\"\\\"\") // \"\")",
+          "logs": "$(.getLogs.output.body | toObject | .logs // [])",
+          "deploymentProcessId": "$(.getLogs.output.body | toObject | .logs[0].messages | map(select(.messageId == \"DEPLOYMENT_STARTED\")) | .[0].message // \"\" | split(\"Process id: \") | .[1] // \"\")"
+        },
+        "executors": [
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "headers": "{\"Accept\": \"application/json\"}",
+              "clientId": "$(.execution.input.serviceKey.uaa.clientid)",
+              "tokenUrl": "$(.execution.input.serviceKey.uaa.url)/oauth/token",
+              "method": "GET",
+              "clientSecret": "$(.execution.input.serviceKey.uaa.clientsecret)",
+              "url": "$(.execution.input.serviceKey.uri)/v2/actions/$(.execution.input.actionId)/logs",
+              "timeout": "30"
+            },
+            "alias": "getLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.getLogs.output.status)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "200"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [
+              {
+                "message": "Failed to retrieve transport action logs (HTTP $(.getLogs.output.status)): $(.getLogs.output.body)",
+                "when": {
+                  "semantic": "OR",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.getLogs.output.status)",
+                          "operator": "NOT_EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "200"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:GetTransportActionLogs:1",
+      "name": "GetTransportActionLogs",
+      "description": "[internal helper - used by other cTMS commands] Retrieve logs for a transport action in SAP Cloud Transport Management service",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "actionId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the transport action for which to retrieve logs"
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": {
+            "inputReference": "02XP260-<<<TENANT_ID>>>:cTMS:1",
+            "inputKey": "serviceKey"
+          },
+          "description": "Service Key for Cloud Transport Management service"
+        }
+      },
+      "outputKeys": {
+        "transportRequestName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Human-readable name of the transported request"
+        },
+        "actionStatus": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Overall status of the transport action"
+        },
+        "lastMessage": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Last message from the first entity's message log"
+        },
+        "logs": {
+          "type": "array",
+          "sensitive": false,
+          "description": "List of log entries for the transport action"
+        },
+        "deploymentProcessId": {
+          "type": "string",
+          "sensitive": false,
+          "description": "CF MTA deployment process ID, usable with 'cf dmol -i <id>'"
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "perNode": "$(.scan.output.outputs | map(toObject) | map({nodeId: .nodeId, counts: .counts, failedCount: .failedCount, runningCount: .runningCount}))",
+          "healthy": "$((.scan.output.outputs | map(toObject) | map(.failedCount) | add // 0) == 0)",
+          "failedTransportRequests": "$(.scan.output.outputs | map(toObject) | map(.failedTransportRequests) | add // [])",
+          "totalFailed": "$(.scan.output.outputs | map(toObject) | map(.failedCount) | add // 0)",
+          "nodeCount": "$(.listNodes.output.nodes | length)",
+          "totalRunning": "$(.scan.output.outputs | map(toObject) | map(.runningCount) | add // 0)"
+        },
+        "executors": [
+          {
+            "execute": "ctms-sapcp:ListTransportNodes:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "listNodes",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:ForEach:2",
+            "input": {
+              "inputMapping": "{\"serviceKey\": \"$(.execution.input.serviceKey)\", \"nodeId\": \"$(.scan.current.item)\"}",
+              "inputs": "$(.listNodes.output.nodes | map(.id))",
+              "command": "02XP260-<<<TENANT_ID>>>:NodeHealthSummary:1"
+            },
+            "alias": "scan",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:GetTransportHealthReport:1",
+      "name": "GetTransportHealthReport",
+      "description": "Check the overall health of SAP Cloud Transport Management (cTMS): scans every transport node and returns how many transport requests are in each status, how many have failed (Error or Fatal), how many are still running, and the full list of failed transport requests. Call this first to find out whether anything is broken and which transport requests need attention. Requires no node id.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Transport Management service instance."
+        }
+      },
+      "outputKeys": {
+        "perNode": {
+          "type": "array",
+          "sensitive": false,
+          "description": "Per-node breakdown: for each node, the status counts and the number of failed and running transport requests."
+        },
+        "healthy": {
+          "type": "boolean",
+          "sensitive": false,
+          "description": "true when there are zero failed (Error or Fatal) transport requests across all nodes; false when at least one has failed."
+        },
+        "failedTransportRequests": {
+          "type": "array",
+          "sensitive": false,
+          "description": "List of every failed transport request, each with its id, status, node id, and description. Use these ids with the retry or per-request commands."
+        },
+        "totalFailed": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total count of failed (Error + Fatal) transport requests across all nodes."
+        },
+        "nodeCount": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of transport nodes that were scanned."
+        },
+        "totalRunning": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total count of transport requests still running across all nodes."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "failedLogs": "$(.fetchLogs.output.outputs | map(toObject) | map({transportRequestId: .transportRequestId, nodeId: .nodeId, status: .status, lastMessage: .lastMessage, deploymentProcessId: .deploymentProcessId}))",
+          "perNode": "$(.scan.output.outputs | map(toObject) | map({nodeId: .nodeId, counts: .counts, failedCount: .failedCount, runningCount: .runningCount}))",
+          "healthy": "$((.scan.output.outputs | map(toObject) | map(.failedCount) | add // 0) == 0)",
+          "failedTransportRequests": "$(.scan.output.outputs | map(toObject) | map(.failedTransportRequests) | add // [])",
+          "totalFailed": "$(.scan.output.outputs | map(toObject) | map(.failedCount) | add // 0)",
+          "nodeCount": "$(.listNodes.output.nodes | length)",
+          "totalRunning": "$(.scan.output.outputs | map(toObject) | map(.runningCount) | add // 0)"
+        },
+        "executors": [
+          {
+            "execute": "ctms-sapcp:ListTransportNodes:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "listNodes",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:ForEach:2",
+            "input": {
+              "inputMapping": "{\"serviceKey\": \"$(.execution.input.serviceKey)\", \"nodeId\": \"$(.scan.current.item)\"}",
+              "inputs": "$(.listNodes.output.nodes | map(.id))",
+              "command": "02XP260-<<<TENANT_ID>>>:NodeHealthSummary:1"
+            },
+            "alias": "scan",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:ForEach:2",
+            "input": {
+              "inputMapping": "{\"serviceKey\": \"$(.execution.input.serviceKey)\", \"nodeId\": \"$(.fetchLogs.current.item | toObject | .nodeId)\", \"transportRequestId\": \"$(.fetchLogs.current.item | toObject | .transportRequestId)\"}",
+              "inputs": "$(.scan.output.outputs | map(toObject) | map(.failedTransportRequests) | add | map({nodeId: .nodeId, transportRequestId: .id} | toMinifiedJsonString))",
+              "command": "02XP260-<<<TENANT_ID>>>:GetTransportRequestLogs:1"
+            },
+            "alias": "fetchLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.scan.output.outputs | map(toObject) | map(.failedTransportRequests) | add | length)",
+                      "operator": "NOT_EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:GetTransportHealthReportWithLogs:1",
+      "name": "GetTransportHealthReportWithLogs",
+      "description": "Full diagnostic health check of SAP Cloud Transport Management (cTMS): scans every transport node, reports status counts and failed transport requests, AND fetches the detailed logs for each failed transport request (its final status, the last log message / error, and the Cloud Foundry deployment process id). Call this when you need not just WHAT failed but WHY. Requires no node id.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Transport Management service instance."
+        }
+      },
+      "outputKeys": {
+        "failedLogs": {
+          "type": "array",
+          "sensitive": false,
+          "description": "Diagnostic logs for each failed transport request: transport request id, node id, final status, the last log message (usually the root-cause error), and the Cloud Foundry deployment process id for cf dmol."
+        },
+        "perNode": {
+          "type": "array",
+          "sensitive": false,
+          "description": "Per-node breakdown of status counts and failed/running counts."
+        },
+        "healthy": {
+          "type": "boolean",
+          "sensitive": false,
+          "description": "true when there are zero failed (Error or Fatal) transport requests across all nodes; false otherwise."
+        },
+        "failedTransportRequests": {
+          "type": "array",
+          "sensitive": false,
+          "description": "List of every failed transport request, each with its id, status, node id, and description."
+        },
+        "totalFailed": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total count of failed (Error + Fatal) transport requests across all nodes."
+        },
+        "nodeCount": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of transport nodes that were scanned."
+        },
+        "totalRunning": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total count of transport requests still running across all nodes."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "found": "$(.findStatus.output.found)",
+          "transportRequestId": "$(.execution.input.transportRequestId)",
+          "lastMessage": "$(.fetchLogs.output.lastMessage // \"\")",
+          "nodeId": "$(.findStatus.output.nodeId)",
+          "logs": "$(.fetchLogs.output.logs // [])",
+          "deploymentProcessId": "$(.fetchLogs.output.deploymentProcessId // \"\")",
+          "status": "$(.fetchLogs.output.status // .findStatus.output.status)"
+        },
+        "executors": [
+          {
+            "execute": "02XP260-<<<TENANT_ID>>>:GetTransportRequestStatus:1",
+            "input": {
+              "transportRequestId": "$(.execution.input.transportRequestId)",
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "findStatus",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "02XP260-<<<TENANT_ID>>>:GetTransportRequestLogs:1",
+            "input": {
+              "transportRequestId": "$(.execution.input.transportRequestId)",
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.findStatus.output.nodeId)"
+            },
+            "alias": "fetchLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.findStatus.output.found)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "true"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:GetTransportRequestHealthWithLogs:1",
+      "name": "GetTransportRequestHealthWithLogs",
+      "description": "Health check for ONE specific transport request, identified only by its id. Automatically finds which transport node the request belongs to, then returns its current status plus detailed logs: the last log message (root-cause error if it failed) and the Cloud Foundry deployment process id. Use this to inspect a single transport request after GetTransportHealthReport has pointed you at a failing id. Requires no node id.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "The numeric id of the transport request to inspect (e.g. 535)."
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Transport Management service instance."
+        }
+      },
+      "outputKeys": {
+        "found": {
+          "type": "boolean",
+          "sensitive": false,
+          "description": "true if the transport request was located in one of the transport nodes; false if no node contains it."
+        },
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "The transport request id that was inspected."
+        },
+        "lastMessage": {
+          "type": "string",
+          "sensitive": false,
+          "description": "The last log message for the request - typically the root-cause error message when it failed."
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Id of the transport node that contains this transport request."
+        },
+        "logs": {
+          "type": "array",
+          "sensitive": false,
+          "description": "Full array of log actions for the transport request."
+        },
+        "deploymentProcessId": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Cloud Foundry MTA deployment process id, usable with: cf dmol -i <id>."
+        },
+        "status": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Current status of the transport request (e.g. succeeded, fatal, error, running)."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "transportRequestId": "$(.execution.input.transportRequestId)",
+          "lastMessage": "$(.getLogs.output.body | toObject | .logs | last | .entities | last | .messages | last | .message // \"\" | rtrimstr(\" \") | rtrimstr(\"\\\"\"))",
+          "nodeId": "$(.execution.input.nodeId)",
+          "logs": "$(.getLogs.output.body | toObject | .logs // [])",
+          "deploymentProcessId": "$(.getLogs.output.body | toObject | .logs | last | .messages | map(select(.messageId == \"DEPLOYMENT_STARTED\")) | .[0].message // \"\" | split(\"Process id: \") | .[1] // \"\")",
+          "status": "$(.getLogs.output.body | toObject | .logs | last | .status // \"\")"
+        },
+        "executors": [
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "headers": "{\"Accept\": \"application/json\"}",
+              "clientId": "$(.execution.input.serviceKey.uaa.clientid)",
+              "tokenUrl": "$(.execution.input.serviceKey.uaa.url)/oauth/token",
+              "method": "GET",
+              "clientSecret": "$(.execution.input.serviceKey.uaa.clientsecret)",
+              "url": "$(.execution.input.serviceKey.uri)/v2/nodes/$(.execution.input.nodeId)/transportRequests/$(.execution.input.transportRequestId)/logs",
+              "timeout": "30"
+            },
+            "alias": "getLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.getLogs.output.status)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "200"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [
+              {
+                "message": "Failed to retrieve logs for transport request $(.execution.input.transportRequestId) (HTTP $(.getLogs.output.status)): $(.getLogs.output.body)",
+                "when": {
+                  "semantic": "OR",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.getLogs.output.status)",
+                          "operator": "NOT_EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "200"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:GetTransportRequestLogs:1",
+      "name": "GetTransportRequestLogs",
+      "description": "[internal helper - used by other cTMS commands] Helper: fetches the logs for a single transport request by node + transport request id, and extracts status and last message. Used by GetTransportHealthReportWithLogs.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the transport request to fetch logs for"
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service Key for Cloud Transport Management service"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the node the transport request belongs to"
+        }
+      },
+      "outputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "ID of the transport request"
+        },
+        "lastMessage": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Last log message for the transport request"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "ID of the node"
+        },
+        "logs": {
+          "type": "array",
+          "sensitive": false,
+          "description": "Full log array for the transport request"
+        },
+        "deploymentProcessId": {
+          "type": "string",
+          "sensitive": false,
+          "description": "CF MTA deployment process ID, if present"
+        },
+        "status": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Status of the transport request"
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "found": "$(.search.output.outputs | map(toObject) | filter(.found == true) | length > 0)",
+          "transportRequestId": "$(.execution.input.transportRequestId)",
+          "transportRequest": "$(.search.output.outputs | map(toObject) | filter(.found == true) | .[0].transportRequest // {})",
+          "nodeId": "$(.search.output.outputs | map(toObject) | filter(.found == true) | .[0].nodeId // 0)",
+          "status": "$(.search.output.outputs | map(toObject) | filter(.found == true) | .[0].status // \"NOT_FOUND\")"
+        },
+        "executors": [
+          {
+            "execute": "ctms-sapcp:ListTransportNodes:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "listNodes",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:ForEach:2",
+            "input": {
+              "inputMapping": "{\"serviceKey\": \"$(.execution.input.serviceKey)\", \"nodeId\": \"$(.search.current.item)\", \"transportRequestId\": \"$(.execution.input.transportRequestId)\"}",
+              "inputs": "$(.listNodes.output.nodes | map(.id))",
+              "command": "02XP260-<<<TENANT_ID>>>:FindTransportRequestInNode:1"
+            },
+            "alias": "search",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:GetTransportRequestStatus:1",
+      "name": "GetTransportRequestStatus",
+      "description": "Look up the current status of a specific transport request by its id, without needing its node. Searches every transport node across all statuses and returns the transport request's status and the node it lives in. Use this as a lightweight final verification step after a retry to confirm the transport now shows as succeeded. Requires no node id.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "The numeric id of the transport request to check (e.g. 535)."
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Transport Management service instance."
+        }
+      },
+      "outputKeys": {
+        "found": {
+          "type": "boolean",
+          "sensitive": false,
+          "description": "true if the transport request was located in one of the transport nodes; false otherwise."
+        },
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "The transport request id that was checked."
+        },
+        "transportRequest": {
+          "type": "object",
+          "sensitive": false,
+          "description": "The full transport request object as returned by cTMS."
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Id of the transport node that contains this transport request."
+        },
+        "status": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Current status of the transport request (e.g. succeeded, fatal, error, running, initial)."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "failedCount": "$((.listError.output.transportRequests | length) + (.listFatal.output.transportRequests | length))",
+          "counts": "$(.buildCounts.output.output | join(\"\") | toObject)",
+          "failedTransportRequests": "$((.listError.output.transportRequests + .listFatal.output.transportRequests) | map({id: .id, status: .status, nodeId: $.execution.input.nodeId, description: (.description // \"\")}))",
+          "runningCount": "$(.listRunning.output.transportRequests | length)",
+          "nodeId": "$(.execution.input.nodeId)"
+        },
+        "executors": [
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Running"
+            },
+            "alias": "listRunning",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Initial"
+            },
+            "alias": "listInitial",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Repeatable"
+            },
+            "alias": "listRepeatable",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Succeeded"
+            },
+            "alias": "listSucceeded",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Skipped"
+            },
+            "alias": "listSkipped",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Warning"
+            },
+            "alias": "listWarning",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Error"
+            },
+            "alias": "listError",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "ctms-sapcp:ListTransportRequests:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "nodeId": "$(.execution.input.nodeId)",
+              "status": "Fatal"
+            },
+            "alias": "listFatal",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "scripts-sapcp:ExecuteScript:2",
+            "input": {
+              "script": "#!/bin/bash\necho \"{\\\"Running\\\": $(.listRunning.output.transportRequests | length), \\\"Initial\\\": $(.listInitial.output.transportRequests | length), \\\"Repeatable\\\": $(.listRepeatable.output.transportRequests | length), \\\"Succeeded\\\": $(.listSucceeded.output.transportRequests | length), \\\"Skipped\\\": $(.listSkipped.output.transportRequests | length), \\\"Warning\\\": $(.listWarning.output.transportRequests | length), \\\"Error\\\": $(.listError.output.transportRequests | length), \\\"Fatal\\\": $(.listFatal.output.transportRequests | length)}\""
+            },
+            "alias": "buildCounts",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:NodeHealthSummary:1",
+      "name": "NodeHealthSummary",
+      "description": "[internal helper - used by other cTMS commands] Helper: returns status counts and the list of failed (Error/Fatal) transport requests for a single node. Used by GetTransportHealthReport.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service Key for Cloud Transport Management service"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "ID of the node to summarize"
+        }
+      },
+      "outputKeys": {
+        "failedCount": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of Error + Fatal transport requests in this node"
+        },
+        "counts": {
+          "type": "object",
+          "sensitive": false,
+          "description": "Count of transport requests by status for this node"
+        },
+        "failedTransportRequests": {
+          "type": "array",
+          "sensitive": false,
+          "description": "List of failed (Error/Fatal) transport requests with id, status, and node"
+        },
+        "runningCount": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of Running transport requests in this node"
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "ID of the node"
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "actionStatus": "$(.getLogs.output.actionStatus)",
+          "lastMessage": "$(.getLogs.output.lastMessage)",
+          "actionId": "$(.findNode.output.outputs | map(toObject) | filter(.found == true) | .[0].actionId)",
+          "retriedTransportRequestId": "$(.execution.input.transportRequestId)",
+          "nodeId": "$(.findNode.output.outputs | map(toObject) | filter(.found == true) | .[0].nodeId)",
+          "deploymentProcessId": "$(.getLogs.output.deploymentProcessId)"
+        },
+        "executors": [
+          {
+            "execute": "ctms-sapcp:ListTransportNodes:1",
+            "input": {
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "listNodes",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:ForEach:2",
+            "input": {
+              "inputMapping": "{\"serviceKey\": \"$(.execution.input.serviceKey)\", \"nodeId\": \"$(.findNode.current.item)\", \"transportRequestId\": \"$(.execution.input.transportRequestId)\", \"tmsUser\": \"$(.execution.input.tmsUser)\"}",
+              "inputs": "$(.listNodes.output.nodes | map(.id))",
+              "command": "02XP260-<<<TENANT_ID>>>:FindAndImportInNode:1"
+            },
+            "alias": "findNode",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "02XP260-<<<TENANT_ID>>>:GetTransportActionLogs:1",
+            "input": {
+              "actionId": "$(.findNode.output.outputs | map(toObject) | filter(.found == true) | .[0].actionId)",
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "getLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.findNode.output.outputs | map(toObject) | filter(.found == true) | length)",
+                      "operator": "NOT_EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "02XP260-<<<TENANT_ID>>>:RetryTransportRequestByIdAnyNode:1",
+      "name": "RetryTransportRequestByIdAnyNode",
+      "description": "Re-import (retry) a specific transport request by its id, without needing to know its node. Automatically discovers which transport node holds the request and triggers a fresh import there, then returns the action logs. Use this to remediate a failed transport AFTER the root cause has been fixed (for example, after creating a missing service instance). Requires no node id.",
+      "catalog": "02XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "transportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "The numeric id of the transport request to retry / re-import (e.g. 535)."
+        },
+        "tmsUser": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "",
+          "defaultValueFromInput": null,
+          "description": "Optional display name shown in the cTMS UI as the user that triggered the import. Leave empty to use the authenticated technical user."
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Transport Management service instance."
+        }
+      },
+      "outputKeys": {
+        "actionStatus": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Status of the re-import action after it ran (e.g. succeeded, fatal, error)."
+        },
+        "lastMessage": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Last log message of the retry - the root-cause error if it failed again, or a success message."
+        },
+        "actionId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Id of the newly triggered import action in cTMS."
+        },
+        "retriedTransportRequestId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "The transport request id that was retried."
+        },
+        "nodeId": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Id of the transport node where the request was found and re-imported."
+        },
+        "deploymentProcessId": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Cloud Foundry MTA deployment process id of the retry, usable with: cf dmol -i <id>."
+        }
+      },
+      "tags": {}
+    }
+  ]
+}

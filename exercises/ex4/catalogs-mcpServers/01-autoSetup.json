@@ -1,0 +1,546 @@
+{
+  "id": "01XP260-<<<TENANT_ID>>>",
+  "technicalName": "01XP260",
+  "name": "01-AutomatedSetup",
+  "description": "",
+  "owner": "<<<TENANT_ID>>>",
+  "tags": {},
+  "documentationUrl": null,
+  "inputs": [
+    {
+      "id": "01XP260-<<<TENANT_ID>>>:targetEnvironment:1",
+      "name": "targetEnvironment",
+      "description": null,
+      "catalog": "01XP260-<<<TENANT_ID>>>",
+      "owner": null,
+      "version": 1,
+      "keys": {
+        "spaceId": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "subaccountID": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "org": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "subaccount": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "description": "SAP Alert Notification Service for SAP BTP"
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Technical name of the SAP BTP region, e.g. cf-eu10, cf-eu10-004"
+        },
+        "space": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "subAccount": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        }
+      },
+      "values": {
+        "spaceId": "bf5a4aa4-029b-4f58-b8dd-275363c9a288",
+        "subaccountID": "a8e91277-310f-4c1b-b0e7-f252c7e6dad3",
+        "org": "282daf6c-3f7a-4d38-8b03-286d24b22205",
+        "subaccount": "a8e91277-310f-4c1b-b0e7-f252c7e6dad3",
+        "region": "cf-eu10-005",
+        "space": "prod",
+        "subAccount": "282daf6c-3f7a-4d38-8b03-286d24b22205",
+        "serviceKey": ""
+      },
+      "tags": {}
+    },
+    {
+      "id": "01XP260-<<<TENANT_ID>>>:techUser:1",
+      "name": "techUser",
+      "description": null,
+      "catalog": "01XP260-<<<TENANT_ID>>>",
+      "owner": null,
+      "version": 1,
+      "keys": {
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "description": "Password for SAP BTP user account used for authentication"
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "description": "UserID/Email for SAP BTP user account used for authentication"
+        }
+      },
+      "values": {
+        "user": "DL_63D9930AC18772029AE99711@global.corp.sap",
+        "password": ""
+      },
+      "tags": {}
+    }
+  ],
+  "commands": [
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "serviceInstance": "$(.CreateDestinationService.output.serviceInstance)",
+          "serviceInstanceName": "$(.execution.input.instanceName)"
+        },
+        "executors": [
+          {
+            "execute": "cf-sapcp:CreateCfServiceInstance:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "instanceName": "$(.execution.input.instanceName)",
+              "org": "$(.execution.input.org)",
+              "service": "destination",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "plan": "lite",
+              "space": "$(.execution.input.space)"
+            },
+            "alias": "CreateDestinationService",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "01XP260-<<<TENANT_ID>>>:CreateDestination:1",
+      "name": "CreateDestination",
+      "description": "Create a new subaccount, configure entitlements and setup essential service instances",
+      "catalog": "01XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": {
+            "inputReference": "01XP260-<<<TENANT_ID>>>:techUser:1",
+            "inputKey": "password"
+          },
+          "description": "Password for SAP BTP user account used for authentication"
+        },
+        "org": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": {
+            "inputReference": "01XP260-<<<TENANT_ID>>>:targetEnvironment:1",
+            "inputKey": "org"
+          },
+          "description": " Display name of the Cloud Foundry organization"
+        },
+        "instanceName": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": null
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "cf-eu10-005",
+          "defaultValueFromInput": null,
+          "description": "Technical name of the SAP BTP region, e.g. cf-eu10, cf-eu10-004"
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": {
+            "inputReference": "01XP260-<<<TENANT_ID>>>:techUser:1",
+            "inputKey": "user"
+          },
+          "description": "UserID/Email for SAP BTP user account used for authentication"
+        },
+        "space": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": {
+            "inputReference": "01XP260-<<<TENANT_ID>>>:targetEnvironment:1",
+            "inputKey": "space"
+          },
+          "description": "Display name of the Cloud Foundry space"
+        }
+      },
+      "outputKeys": {
+        "serviceInstance": {
+          "type": "string",
+          "sensitive": false,
+          "description": " GUID of target Cloud Foundry service instance created during the execution"
+        },
+        "serviceInstanceName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of Cloud Foundry service instance created after the execution"
+        }
+      },
+      "tags": {
+        "feature:logs": "",
+        "feature:priority": "medium",
+        "feature:retentionPeriod": "672",
+        "feature:retentionPolicy": "archive"
+      }
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "serviceInstance": "$(.CreateDestinationService.output.serviceInstance)",
+          "serviceInstanceName": "$(.execution.input.instanceName)"
+        },
+        "executors": [
+          {
+            "execute": "cf-sapcp:CreateCfServiceInstance:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "instanceName": "$(.execution.input.instanceName)",
+              "org": "$(.execution.input.org)",
+              "service": "destination",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "plan": "lite",
+              "space": "$(.execution.input.space)"
+            },
+            "alias": "CreateDestinationService",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "01XP260-<<<TENANT_ID>>>:CreateService:1",
+      "name": "CreateService",
+      "description": "Create a new subaccount, configure entitlements and setup essential service instances",
+      "catalog": "01XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Password for SAP BTP user account used for authentication"
+        },
+        "org": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": " Display name of the Cloud Foundry organization"
+        },
+        "instanceName": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": null
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Technical name of the SAP BTP region, e.g. cf-eu10, cf-eu10-004"
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "UserID/Email for SAP BTP user account used for authentication"
+        },
+        "space": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Display name of the Cloud Foundry space"
+        }
+      },
+      "outputKeys": {
+        "serviceInstance": {
+          "type": "string",
+          "sensitive": false,
+          "description": " GUID of target Cloud Foundry service instance created during the execution"
+        },
+        "serviceInstanceName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of Cloud Foundry service instance created after the execution"
+        }
+      },
+      "tags": {
+        "feature:logs": "",
+        "feature:priority": "medium",
+        "feature:retentionPeriod": "672",
+        "feature:retentionPolicy": "archive"
+      }
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "totalResultsCount": "$(.listEvents.output.totalResultsCount)",
+          "latestSeverity": "$((.listEvents.output.events | sort_by(.eventTimestamp) | last).severity // \"\")",
+          "latestEventType": "$((.listEvents.output.events | sort_by(.eventTimestamp) | last).eventType // \"\")",
+          "latestNodeId": "$((.listEvents.output.events | sort_by(.eventTimestamp) | last).tags.nodeId // \"\")",
+          "latestNodeName": "$((.listEvents.output.events | sort_by(.eventTimestamp) | last).tags.nodeName // \"\")",
+          "events": "$(.listEvents.output.events)",
+          "latestTransportRequestIds": "$((.listEvents.output.events | sort_by(.eventTimestamp) | last).tags.transportRequestIds // \"\")",
+          "latestSubject": "$((.listEvents.output.events | sort_by(.eventTimestamp) | last).subject // \"\")"
+        },
+        "executors": [
+          {
+            "execute": "ans-sapcp:ListMatchedAnsEvents:1",
+            "input": {
+              "pageSize": "$(.execution.input.pageSize)",
+              "serviceKey": "$(.execution.input.serviceKey)"
+            },
+            "alias": "listEvents",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "01XP260-<<<TENANT_ID>>>:XP260GetStoredAlerts:1",
+      "name": "XP260GetStoredAlerts",
+      "description": "Retrieve the transport-failure alerts stored by SAP Alert Notification Service (the ctmsTransportFailed subscription's Store action). Returns the matched events so you can read the captured failure without an email or chat channel.",
+      "catalog": "01XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "pageSize": {
+          "type": "number",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "10",
+          "defaultValueFromInput": null,
+          "description": "Maximum number of stored events to return. Defaults to 10."
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": {
+            "inputReference": "01XP260-<<<TENANT_ID>>>:targetEnvironment:1",
+            "inputKey": "serviceKey"
+          },
+          "description": "Service key for the SAP Alert Notification Service instance. Defaults to the stored targetEnvironment input."
+        }
+      },
+      "outputKeys": {
+        "totalResultsCount": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total number of stored events that matched."
+        },
+        "latestSeverity": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Severity of the most recent alert (ERROR or FATAL for a failed transport)."
+        },
+        "latestEventType": {
+          "type": "string",
+          "sensitive": false,
+          "description": "The event type, e.g. TmsImportFinished."
+        },
+        "latestNodeId": {
+          "type": "string",
+          "sensitive": false,
+          "description": "ID of the transport node — pass this as nodeId when retrying the transport in Exercise 4."
+        },
+        "latestNodeName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of the transport node the failed import ran on, e.g. 'Target'."
+        },
+        "events": {
+          "type": "array",
+          "sensitive": false,
+          "description": "The matched transport-failure events stored by Alert Notification Service."
+        },
+        "latestTransportRequestIds": {
+          "type": "string",
+          "sensitive": false,
+          "description": "The transport request ID(s) that failed, e.g. [848] — use this to retry the transport in Exercise 4."
+        },
+        "latestSubject": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Human-readable subject of the most recent stored alert, e.g. \"Import Finished in the 'Target' node\"."
+        }
+      },
+      "tags": {}
+    }
+  ]
+}

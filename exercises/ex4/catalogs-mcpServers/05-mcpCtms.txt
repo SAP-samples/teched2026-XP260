@@ -1,0 +1,104 @@
+{
+  "name": "ctms-transport-remediation",
+  "enabled": true,
+  "instructions": "MCP server for assessing and remediating failed transport requests in SAP Cloud Transport Management (cTMS) on SAP BTP.\n\nUse this server to run the full transport health and remediation loop:\n- **Assess**: call `get_transport_health_report` to find out whether any transport requests have failed and which ones. Use `get_health_report_with_logs` when you also need the root-cause error logs for every failure in one call.\n- **Inspect a single request**: call `get_request_health_with_logs` with a transport request id to see that one request's status, last error message, and Cloud Foundry deployment process id.\n- **Diagnose**: read the last log message to find the root cause. A common cause is a missing service instance in the target space, e.g. a message like \"Service instance bookshop-dest not found\".\n- **Remediate the root cause**: when a transport failed because a service instance is missing, call `create_missing_service` with the transport request id and the missing service instance name (e.g. bookshop-dest). It automatically creates the service in the correct Cloud Foundry org, space and region taken from the transport's own logs.\n- **Retry**: after the root cause is fixed, call `retry_transport_request` with the transport request id to re-import it.\n- **Verify**: call `get_transport_request_status` with the transport request id to confirm the import now succeeded.\n\nTypical remediation sequence: get_request_health_with_logs -> create_missing_service -> retry_transport_request -> get_transport_request_status.\n\nAll tools identify transport requests by their numeric id only - no transport node id, org, space or region is ever required, the server resolves them automatically. Credentials for cTMS and for the BTP account used to create services are injected automatically; you do not need to supply any service key or password.",
+  "mcpTools": [
+    {
+      "commandId": "02XP260-<<<TENANT_ID>>>:GetTransportHealthReport:1",
+      "name": "get_transport_health_report",
+      "enabled": true,
+      "inputReferences": [
+        "02XP260-<<<TENANT_ID>>>:cTMS:1"
+      ],
+      "tags": {},
+      "title": "Get Transport Health Report",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "02XP260-<<<TENANT_ID>>>:GetTransportHealthReportWithLogs:1",
+      "name": "get_health_report_with_logs",
+      "enabled": true,
+      "inputReferences": [
+        "02XP260-<<<TENANT_ID>>>:cTMS:1"
+      ],
+      "tags": {},
+      "title": "Get Transport Health Report With Logs",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "02XP260-<<<TENANT_ID>>>:GetTransportRequestHealthWithLogs:1",
+      "name": "get_request_health_with_logs",
+      "enabled": true,
+      "inputReferences": [
+        "02XP260-<<<TENANT_ID>>>:cTMS:1"
+      ],
+      "tags": {},
+      "title": "Get Transport Request Health With Logs",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "02XP260-<<<TENANT_ID>>>:RetryTransportRequestByIdAnyNode:1",
+      "name": "retry_transport_request",
+      "enabled": true,
+      "inputReferences": [
+        "02XP260-<<<TENANT_ID>>>:cTMS:1"
+      ],
+      "tags": {},
+      "title": "Retry Transport Request",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "02XP260-<<<TENANT_ID>>>:GetTransportRequestStatus:1",
+      "name": "get_transport_request_status",
+      "enabled": true,
+      "inputReferences": [
+        "02XP260-<<<TENANT_ID>>>:cTMS:1"
+      ],
+      "tags": {},
+      "title": "Get Transport Request Status",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "sync": false,
+      "waitTimeSeconds": null
+    },
+    {
+      "commandId": "02XP260-<<<TENANT_ID>>>:CreateMissingService:1",
+      "name": "create_missing_service",
+      "enabled": true,
+      "inputReferences": [
+        "02XP260-<<<TENANT_ID>>>:cTMS:1",
+        "01XP260-<<<TENANT_ID>>>:techUser:1"
+      ],
+      "tags": {},
+      "title": "Create Missing Service",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "sync": false,
+      "waitTimeSeconds": null
+    }
+  ]
+}

@@ -1,0 +1,745 @@
+{
+  "id": "cls-<<<TENANT_ID>>>",
+  "technicalName": "cls",
+  "name": "SAP Cloud Logging",
+  "description": "Provides commands for sending and querying logs in SAP Cloud Logging.",
+  "owner": "<<<TENANT_ID>>>",
+  "tags": {},
+  "documentationUrl": null,
+  "inputs": [
+    {
+      "id": "cls-<<<TENANT_ID>>>:ServiceKey:1",
+      "name": "ServiceKey",
+      "description": "Cloude Logging Service Key",
+      "catalog": "cls-<<<TENANT_ID>>>",
+      "owner": null,
+      "version": 1,
+      "keys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "description": null
+        }
+      },
+      "values": {
+        "serviceKey": ""
+      },
+      "tags": {}
+    }
+  ],
+  "commands": [
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "hits": "$(.search.output.body | toObject.hits.hits | map(._source))",
+          "total": "$(.search.output.body | toObject.hits.total.value)",
+          "count": "$(.search.output.body | toObject.hits.hits | length)"
+        },
+        "executors": [
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$(nowMillis)"
+            },
+            "alias": "getNow",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$((.getNow.output.message | toNumber) - 900000)"
+            },
+            "alias": "fromLast15Min",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.timeRange)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "last 15 minutes"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$((.getNow.output.message | toNumber) - 3600000)"
+            },
+            "alias": "fromLast1Hour",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.timeRange)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "last 1 hour"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$((.getNow.output.message | toNumber) - 10800000)"
+            },
+            "alias": "fromLast3Hours",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.timeRange)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "last 3 hours"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$((.getNow.output.message | toNumber) - 86400000)"
+            },
+            "alias": "fromLast24Hours",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.timeRange)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "last 24 hours"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {},
+            "alias": "validateInputs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": {
+              "semantic": "AND",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.serviceKey[\"dashboards-endpoint\"] | length)",
+                      "operator": "GREATER_THAN",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.serviceKey[\"dashboards-username\"] | length)",
+                      "operator": "GREATER_THAN",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.serviceKey[\"dashboards-password\"] | length)",
+                      "operator": "GREATER_THAN",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.timeRange)",
+                      "operator": "NOT_EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "custom"
+                      ]
+                    },
+                    {
+                      "expression": "$(.execution.input.from | length)",
+                      "operator": "GREATER_THAN",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.timeRange)",
+                      "operator": "NOT_EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "custom"
+                      ]
+                    },
+                    {
+                      "expression": "$(.execution.input.to | length)",
+                      "operator": "GREATER_THAN",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [
+              {
+                "message": "Service key is missing required fields - provide a valid SAP Cloud Logging service key",
+                "when": {
+                  "semantic": "OR",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.execution.input.serviceKey[\"dashboards-endpoint\"] | length)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "message": "Service key is missing required fields - provide a valid SAP Cloud Logging service key",
+                "when": {
+                  "semantic": "OR",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.execution.input.serviceKey[\"dashboards-username\"] | length)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "message": "Service key is missing required fields - provide a valid SAP Cloud Logging service key",
+                "when": {
+                  "semantic": "OR",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.execution.input.serviceKey[\"dashboards-password\"] | length)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "message": "Input \"from\" is required when timeRange is \"custom\"",
+                "when": {
+                  "semantic": "AND",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.execution.input.timeRange)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "custom"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.execution.input.from | length)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "message": "Input \"to\" is required when timeRange is \"custom\"",
+                "when": {
+                  "semantic": "AND",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.execution.input.timeRange)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "custom"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.execution.input.to | length)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$(.fromLast15Min.output.message // .fromLast1Hour.output.message // .fromLast3Hours.output.message // .fromLast24Hours.output.message // (.execution.input.from | toNumber))"
+            },
+            "alias": "resolveFrom",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$(.execution.input.query)"
+            },
+            "alias": "compactQuery",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.execution.input.query | length)",
+                      "operator": "GREATER_THAN",
+                      "semantic": "OR",
+                      "values": [
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "headers": "{\"Content-Type\":\"application/json\",\"osd-xsrf\":\"true\"}",
+              "password": "$(.execution.input.serviceKey[\"dashboards-password\"])",
+              "method": "POST",
+              "body": "{\"size\": $(.execution.input.size), \"sort\": [{\"_cls_parse_ts\": {\"order\": \"desc\"}}], \"query\": {\"bool\": {\"filter\": [$(if .compactQuery.output.message then .compactQuery.output.message else {\"match_all\": {}} end), {\"range\": {\"_cls_parse_ts\": {\"gte\": $(.resolveFrom.output.message | toNumber), \"lte\": $(if .execution.input.timeRange == \"custom\" then (.execution.input.to | toNumber) else (.getNow.output.message | toNumber) end)}}}]}}}",
+              "user": "$(.execution.input.serviceKey[\"dashboards-username\"])",
+              "successResponseCodes": "[\"2xx\"]",
+              "url": "$(\"https://\" + (.execution.input.serviceKey[\"dashboards-endpoint\"] | ltrimstr(\"https://\")))/api/console/proxy?path=$(.execution.input.indexPattern | toUrlEncoded)%2F_search&method=POST",
+              "timeout": "30"
+            },
+            "alias": "search",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": {
+              "maxCount": 3,
+              "delay": "5s",
+              "logic": "INCREMENTAL",
+              "applyOnValidation": false,
+              "when": {
+                "semantic": "OR",
+                "conditions": [
+                  {
+                    "semantic": "OR",
+                    "cases": [
+                      {
+                        "expression": "$(.search.output.status | valueIn([429, 502, 503, 504]))",
+                        "operator": "EQUALS",
+                        "semantic": "OR",
+                        "values": [
+                          "true"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "repeat": null,
+            "errorMessages": [
+              {
+                "message": "Authentication failed. Provide a valid SAP Cloud Logging service key",
+                "when": {
+                  "semantic": "OR",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.search.output.status | valueIn([401, 403]))",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "true"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "message": "Invalid DSL query: $(.search.output.body | toObject.error.reason)",
+                "when": {
+                  "semantic": "OR",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.search.output.status)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "400"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "message": "Index pattern '$(.execution.input.indexPattern)' not found",
+                "when": {
+                  "semantic": "OR",
+                  "conditions": [
+                    {
+                      "semantic": "OR",
+                      "cases": [
+                        {
+                          "expression": "$(.search.output.status)",
+                          "operator": "EQUALS",
+                          "semantic": "OR",
+                          "values": [
+                            "404"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "cls-<<<TENANT_ID>>>:GetLogs:1",
+      "name": "GetLogs",
+      "description": "Retrieve log entries from SAP Cloud Logging for a given time range. Optionally filter results by using an OpenSearch domain-specific language (DSL) query clause.",
+      "catalog": "cls-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "size": {
+          "type": "number",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": 10000,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "50",
+          "defaultValueFromInput": null,
+          "description": "Maximum number of log entries to return. Default: 50"
+        },
+        "query": {
+          "type": "object",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Optional OpenSearch DSL query clause to filter results. If omitted, all log entries in the time range are returned. Examples: {\"match_phrase\": {\"msg\": \"error\"}}, {\"term\": {\"level.keyword\": \"error\"}}"
+        },
+        "from": {
+          "type": "number",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Start of the time range as a Unix timestamp in milliseconds. Required when 'timeRange' is 'custom'. Example: 1784524536000"
+        },
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": {
+            "inputReference": "cls-<<<TENANT_ID>>>:ServiceKey:1",
+            "inputKey": "serviceKey"
+          },
+          "description": "A service key for your SAP Cloud Logging instance"
+        },
+        "to": {
+          "type": "number",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "End of the time range as a Unix timestamp in milliseconds. Required when 'timeRange' is 'custom'. Example: 1784610936000"
+        },
+        "indexPattern": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": [
+            "logs-otel-*",
+            "logs-*",
+            "logs-json-*",
+            "logs-app-*",
+            "logs-cfsyslog-*",
+            "logs-container-*"
+          ],
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "logs-json-*",
+          "defaultValueFromInput": null,
+          "description": "SAP Cloud Logging index pattern to search. Examples: logs-*, logs-json-*, logs-container-*"
+        },
+        "timeRange": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": [
+            "last 15 minutes",
+            "last 1 hour",
+            "last 3 hours",
+            "last 24 hours",
+            "custom"
+          ],
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "last 15 minutes",
+          "defaultValueFromInput": null,
+          "description": "How far back to search. Defaults to 'last 1 hour'. Set to 'custom' to specify an exact range using the 'from' and 'to' input keys."
+        }
+      },
+      "outputKeys": {
+        "hits": {
+          "type": "array",
+          "sensitive": false,
+          "description": "The matching log entries. Each entry contains the fields from the log document."
+        },
+        "total": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total number of log entries matching the query"
+        },
+        "count": {
+          "type": "number",
+          "sensitive": false,
+          "description": "The number of log entries actually returned. May be less than 'total' if 'total' exceeds the limit."
+        }
+      },
+      "tags": {}
+    }
+  ]
+}
