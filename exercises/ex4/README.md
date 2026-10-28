@@ -12,7 +12,7 @@ You will compose your command on top of the SAP-provided command  **`CreateCfSer
 
 #### Step 1. Review the Pre-Configured Inputs
 
-First, let's navigate to your Automation Pilot: 
+Navigate to your Automation Pilot:
 
 1. In the SAP BTP cockpit, navigate to your subaccount `XP260_S0XX` (e.g. **XP260_S001** — replace `01` with your seat number).
 
@@ -27,7 +27,7 @@ Note: if prompted to sign in, select **tdct3ched1.accounts.ondemand.com** as the
 
    *Select tdct3ched1.accounts.ondemand.com to sign in*
 
-Welcome to Automation Pilot - now you see the Automation Pilot dashboard: 
+The Automation Pilot dashboard opens:
 <br><img src="images/ex04-00-03.png" />
 
 Before building the command, look at the **inputs** already set up in your catalog. Open **Catalogs**, and on the **01-AutomatedSetup** catalog choose **Inputs**.
@@ -69,7 +69,7 @@ First, let's define the command's **Input Keys**.
 In the **Contract → Input Keys** section, choose **Add** for each key below.
 <br><img src="images/ex04-00-04.png" />
 
-Now, let's create the needed inputs one by one. 
+Create the needed inputs one by one.
 
 **`instanceName`** — Name `instanceName`, Type `string`, **Required** "enabled" and click the "Add" button.
 
@@ -193,7 +193,7 @@ The new command opens with an empty **Contract**. Choose **Add** under **Input K
 Choose **Add** under **Output Keys**: 
 <br><img src="images/ex04-00-10.png" /> 
 
-Then, add **`actionId`** : **Type** `string`, **description** *"ID of the import action created in Cloud Transport Management"*).
+Then, add **`actionId`** : **Type** `string`, **description** *"ID of the import action created in Cloud Transport Management"*.
 
 <br><img src="images/ex04-02_08.png" />
 

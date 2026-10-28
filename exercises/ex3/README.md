@@ -48,7 +48,7 @@ Open the **Subscriptions** tab and open the **ctmsTransportFailed** subscription
 
 <br><img src="images/ex03_03.png" />
 
-On the subscription overview, look at the **Matching Conditions**: the subscription matches an event when **eventType *Is Equal To* TmsImportFinished** **and** **severity *Is Equal To* ERROR or FATAL** — in other words, a Cloud Transport Management import that finished with a failure. That is exactly the transport failure from Exercise 2.
+On the subscription overview, look at the **Matching Conditions**: the subscription matches an event when **eventType *Is Equal To* TmsImportFinished** **and** **severity *Is Equal To* ERROR *or* FATAL** — in other words, a Cloud Transport Management import that finished with a failure. That is exactly the transport failure from Exercise 2.
 
 <br><img src="images/ex03_04.png" />
 
