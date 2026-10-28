@@ -104,7 +104,7 @@ The agent created the missing Destination service, retried the transport, and co
 
 ## 5.3 Perform an Application Health Analysis
 
-**Learning Objective**: Ask the agent to investigate the running application's health and produce an evidence-based report, detecting the same memory pattern you observed manually in Exercise 6.
+**Learning Objective**: Ask the agent to investigate the running application's health and produce an evidence-based report, detecting the same memory pattern you will observe manually in Exercise 6.
 
 Now shift from the deployment to the running application itself. Start by asking the agent what is running.
 
