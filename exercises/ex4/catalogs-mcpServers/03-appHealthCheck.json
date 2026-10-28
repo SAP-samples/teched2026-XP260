@@ -1,0 +1,2185 @@
+{
+  "id": "03XP260-<<<TENANT_ID>>>",
+  "technicalName": "03XP260",
+  "name": "03-App Health Monitoring",
+  "description": "",
+  "owner": "<<<TENANT_ID>>>",
+  "tags": {},
+  "documentationUrl": null,
+  "inputs": [
+    {
+      "id": "03XP260-<<<TENANT_ID>>>:CLS:1",
+      "name": "CLS",
+      "description": null,
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "owner": null,
+      "version": 1,
+      "keys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "description": null
+        }
+      },
+      "values": {
+        "serviceKey": ""
+      },
+      "tags": {}
+    }
+  ],
+  "commands": [
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "appState": "$(.GetAppState.output.desiredStateData)",
+          "appEvents": "$(.GetCFAppEvents.output.eventsData)",
+          "appLogs": "$(.GetAppLogs.output.logs | map(toObject))"
+        },
+        "executors": [
+          {
+            "execute": "applm-sapcp:GetCfAppState:2",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)",
+              "refreshToken": "$(.execution.input.refreshToken)"
+            },
+            "alias": "GetAppState",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "monitoring-sapcp:GetCfAppEvents:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)",
+              "refreshToken": "$(.execution.input.refreshToken)"
+            },
+            "alias": "GetCFAppEvents",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "calmhm-sapcp:GetCloudAlmCfAppLogs:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "GetAppLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "applm-sapcp:StartCfApp:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)",
+              "refreshToken": "$(.execution.input.refreshToken)"
+            },
+            "alias": "StartApp",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.GetAppState.output.state)",
+                      "operator": "NOT_EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "STARTED"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:AppLogsAnalysisClean:1",
+      "name": "AppLogsAnalysisClean",
+      "description": "Gather Cloud Foundry application state, recent events, and recent logs for an app, and start it if stopped. No AI Core dependency.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "resourceGroup": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "dev",
+          "defaultValueFromInput": null,
+          "description": "Resource group for the Cloud Foundry space"
+        },
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Password for authentication"
+        },
+        "resourceName": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Name of the Cloud Foundry application"
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Region of the Cloud Foundry instance"
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "User for authentication"
+        },
+        "subAccount": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Sub-account for the Cloud Foundry organization"
+        },
+        "identityProvider": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "tdct3ched1-platform",
+          "defaultValueFromInput": null,
+          "description": "Identity provider for authentication"
+        },
+        "refreshToken": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Refresh token for authentication"
+        }
+      },
+      "outputKeys": {
+        "appState": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Current state of the application"
+        },
+        "appEvents": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "appLogs": {
+          "type": "array",
+          "sensitive": false,
+          "description": "Recent application log entries (parsed JSON objects) for the app from SAP Cloud ALM."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [
+          {
+            "alias": "regionData",
+            "valueFrom": {
+              "inputReference": "metadata-sapcp:CfRegionData:1",
+              "inputKey": "$(.execution.input.region)"
+            }
+          }
+        ],
+        "output": {
+          "spaceName": "$(.getCfSpace.output.body | toObject | .name)",
+          "spaceMemoryPercentage": "$(.calculateSpaceMemoryPercentage.output.message)",
+          "spaceMemoryUsedMb": "$(.getCfSpaceUsage.output.body | toObject | .usage_summary.memory_in_mb)",
+          "orgMemoryUsedMb": "$(.getCfOrgUsage.output.body | toObject | .usage_summary.memory_in_mb)",
+          "orgMemoryQuotaMb": "$(.getCfOrgQuota.output.body | toObject | .apps.total_memory_in_mb)",
+          "resourceName": "$(.getCfSpaceQuota.output.body | toObject | .name // ($.getCfSpace.output.body | toObject | .name) // \"\")",
+          "spaceMemoryQuotaMb": "$(.getCfSpaceQuota.output.body | toObject | .apps.total_memory_in_mb // 0)",
+          "orgMemoryPercentage": "$(.calculateOrgMemoryPercentage.output.message)"
+        },
+        "executors": [
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "clientId": "cf",
+              "tokenUrl": "$(.regionData.uaaTokenUrl)?login_hint=$({ \"origin\": .execution.input.identityProvider } | toUrlEncoded)",
+              "method": "GET",
+              "user": "$(.execution.input.user)",
+              "url": "$(.regionData.cfApiUrl)/v3/spaces/$(.execution.input.spaceId)",
+              "timeout": "10"
+            },
+            "alias": "getCfSpace",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "clientId": "cf",
+              "tokenUrl": "$(.regionData.uaaTokenUrl)?login_hint=$({ \"origin\": .execution.input.identityProvider } | toUrlEncoded)",
+              "method": "GET",
+              "user": "$(.execution.input.user)",
+              "url": "$(.regionData.cfApiUrl)/v3/organizations/$(.getCfSpace.output.body | toObject | .relationships.organization.data.guid)",
+              "timeout": "10"
+            },
+            "alias": "getCfOrg",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "clientId": "cf",
+              "tokenUrl": "$(.regionData.uaaTokenUrl)?login_hint=$({ \"origin\": .execution.input.identityProvider } | toUrlEncoded)",
+              "method": "GET",
+              "user": "$(.execution.input.user)",
+              "url": "$(.regionData.cfApiUrl)/v3/organizations/$(.getCfSpace.output.body | toObject | .relationships.organization.data.guid)/usage_summary",
+              "timeout": "10"
+            },
+            "alias": "getCfOrgUsage",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "clientId": "cf",
+              "tokenUrl": "$(.regionData.uaaTokenUrl)?login_hint=$({ \"origin\": .execution.input.identityProvider } | toUrlEncoded)",
+              "method": "GET",
+              "user": "$(.execution.input.user)",
+              "url": "$(.regionData.cfApiUrl)/v3/organization_quotas/$(.getCfOrg.output.body | toObject | .relationships.quota.data.guid)",
+              "timeout": "10"
+            },
+            "alias": "getCfOrgQuota",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "clientId": "cf",
+              "tokenUrl": "$(.regionData.uaaTokenUrl)?login_hint=$({ \"origin\": .execution.input.identityProvider } | toUrlEncoded)",
+              "method": "GET",
+              "user": "$(.execution.input.user)",
+              "url": "$(.regionData.cfApiUrl)/v3/service_instances?organization_guids=$(.getCfSpace.output.body | toObject | .relationships.organization.data.guid)",
+              "timeout": "10"
+            },
+            "alias": "getServiceInstanceByOrg",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "clientId": "cf",
+              "tokenUrl": "$(.regionData.uaaTokenUrl)?login_hint=$({ \"origin\": .execution.input.identityProvider } | toUrlEncoded)",
+              "method": "GET",
+              "user": "$(.execution.input.user)",
+              "url": "$(.regionData.cfApiUrl)/v3/space_quotas/$(.getCfSpace.output.body | toObject | .relationships.quota.data.guid)",
+              "timeout": "10"
+            },
+            "alias": "getCfSpaceQuota",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "clientId": "cf",
+              "tokenUrl": "$(.regionData.uaaTokenUrl)?login_hint=$({ \"origin\": .execution.input.identityProvider } | toUrlEncoded)",
+              "method": "GET",
+              "user": "$(.execution.input.user)",
+              "url": "$(.regionData.cfApiUrl)/v3/spaces/$(.execution.input.spaceId)/usage_summary",
+              "timeout": "10"
+            },
+            "alias": "getCfSpaceUsage",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "http-sapcp:HttpRequest:1",
+            "input": {
+              "password": "$(.execution.input.password)",
+              "clientId": "cf",
+              "tokenUrl": "$(.regionData.uaaTokenUrl)?login_hint=$({ \"origin\": .execution.input.identityProvider } | toUrlEncoded)",
+              "method": "GET",
+              "user": "$(.execution.input.user)",
+              "url": "$(.regionData.cfApiUrl)/v3/service_instances?space_guids=$(.execution.input.spaceId)",
+              "timeout": "10"
+            },
+            "alias": "getServiceInstanceBySpace",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$(.getCfOrgQuota.output.body | toObject | .apps.total_memory_in_mb | if . == null or . == 0 then 0 else (($.getCfSpaceUsage.output.body | toObject | .usage_summary.memory_in_mb | toNumber) / ($.getCfOrgQuota.output.body | toObject | .apps.total_memory_in_mb | toNumber) * 10000 | round | . / 100) end)"
+            },
+            "alias": "calculateSpaceMemoryPercentage",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "utils-sapcp:Void:1",
+            "input": {
+              "message": "$(.getCfOrgQuota.output.body | toObject | .apps.total_memory_in_mb | if . == null or . == 0 then 0 else (($.getCfOrgUsage.output.body | toObject | .usage_summary.memory_in_mb | toNumber) / ($.getCfOrgQuota.output.body | toObject | .apps.total_memory_in_mb | toNumber) * 10000 | round | . / 100 ) end)"
+            },
+            "alias": "calculateOrgMemoryPercentage",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:CheckResourceQuotaUtilizationClean:1",
+      "name": "CheckResourceQuotaUtilizationClean",
+      "description": "Calculate resource utilization of Cloud Foundry space and its parrent organization",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "spaceId": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "The GUID identifier of the Cloud Foundry space"
+        },
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": null
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": [
+            "metadata-sapcp:CfRegionData:1"
+          ],
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Technical name of your SAP BTP region, e.g. cf-eu10,cf-eu20"
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "User ID or email of a Cloud Foundry technical user"
+        },
+        "identityProvider": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "sap.ids",
+          "defaultValueFromInput": null,
+          "description": "Identity provider to be used  By default it is SAP ID Service (sap.ids). To use a custom IdP, enter origin key from the CF Org/Space members section."
+        }
+      },
+      "outputKeys": {
+        "spaceName": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "spaceMemoryPercentage": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "spaceMemoryUsedMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Absolute memory in MB currently used by the space."
+        },
+        "orgMemoryUsedMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Absolute memory in MB currently used across the whole organization."
+        },
+        "orgMemoryQuotaMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total memory quota in MB allocated to the organization."
+        },
+        "resourceName": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        },
+        "spaceMemoryQuotaMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total memory quota in MB allocated to the space (0 if the space inherits the org quota)."
+        },
+        "orgMemoryPercentage": {
+          "type": "string",
+          "sensitive": false,
+          "description": null
+        }
+      },
+      "tags": {
+        "feature:logs": "",
+        "feature:priority": "medium"
+      }
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "spaceName": "$(.quota.output.spaceName)",
+          "spaceMemoryPercentage": "$(.quota.output.spaceMemoryPercentage)",
+          "spaceMemoryUsedMb": "$(.quota.output.spaceMemoryUsedMb)",
+          "orgMemoryUsedMb": "$(.quota.output.orgMemoryUsedMb)",
+          "orgMemoryQuotaMb": "$(.quota.output.orgMemoryQuotaMb)",
+          "resourceName": "$(.quota.output.resourceName)",
+          "spaceMemoryQuotaMb": "$(.quota.output.spaceMemoryQuotaMb)",
+          "orgMemoryPercentage": "$(.quota.output.orgMemoryPercentage)"
+        },
+        "executors": [
+          {
+            "execute": "03XP260-<<<TENANT_ID>>>:CheckResourceQuotaUtilizationClean:1",
+            "input": {
+              "spaceId": "$(.execution.input.spaceId)",
+              "password": "$(.execution.input.password)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)"
+            },
+            "alias": "quota",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:CheckResourceUtilization:1",
+      "name": "CheckResourceUtilization",
+      "description": "Calculate the resource (memory) utilization of a Cloud Foundry space and its parent organization. Returns the percentage of the memory quota used at both space and org level, so you can judge whether the environment is close to its limits. Credentials are injected automatically.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "spaceId": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "GUID of the Cloud Foundry space whose utilization should be calculated."
+        },
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Password of the SAP BTP account."
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "cf-eu10-005",
+          "defaultValueFromInput": null,
+          "description": "Technical SAP BTP region. Defaults to cf-eu10-005."
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "User id / email of the SAP BTP account."
+        }
+      },
+      "outputKeys": {
+        "spaceName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Display name of the Cloud Foundry space."
+        },
+        "spaceMemoryPercentage": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Percentage of the space's memory quota currently in use."
+        },
+        "spaceMemoryUsedMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Absolute memory in MB currently used by the space."
+        },
+        "orgMemoryUsedMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Absolute memory in MB currently used across the whole organization."
+        },
+        "orgMemoryQuotaMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total memory quota in MB allocated to the organization."
+        },
+        "resourceName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of the resource evaluated."
+        },
+        "spaceMemoryQuotaMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total memory quota in MB allocated to the space (0 if it inherits the org quota)."
+        },
+        "orgMemoryPercentage": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Percentage of the organization's memory quota currently in use."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "desiredState": "$(.app.output.desiredState)",
+          "appName": "$(.app.output.resourceName)",
+          "instanceCount": "$(.app.output.resourceInstances | length)",
+          "totalAllocatedMb": "$(.app.output.memory * (.app.output.resourceInstances | length))",
+          "memoryPerInstanceMb": "$(.app.output.memory)"
+        },
+        "executors": [
+          {
+            "execute": "applm-sapcp:GetCfAppState:2",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "app",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:GetAppAllocatedMemory:1",
+      "name": "GetAppAllocatedMemory",
+      "description": "Report the total memory currently allocated (reserved) for a Cloud Foundry application: its per-instance memory, number of running instances, and the resulting total (per-instance memory x instances). Use this to see how much memory an app holds before deciding whether to scale it up. Credentials are injected automatically.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "resourceGroup": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "prod",
+          "defaultValueFromInput": null,
+          "description": "Name or GUID of the Cloud Foundry space the app runs in. Defaults to 'prod'."
+        },
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Password of the SAP BTP account."
+        },
+        "resourceName": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "bookshop-srv",
+          "defaultValueFromInput": null,
+          "description": "Name of the Cloud Foundry application. Defaults to 'bookshop-srv'."
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "cf-eu10-005",
+          "defaultValueFromInput": null,
+          "description": "Technical SAP BTP region. Defaults to cf-eu10-005."
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "User id / email of the SAP BTP account."
+        },
+        "subAccount": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Name or GUID of the Cloud Foundry organization the app runs in."
+        },
+        "identityProvider": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "sap.ids",
+          "defaultValueFromInput": null,
+          "description": "Identity provider origin key. Defaults to sap.ids."
+        }
+      },
+      "outputKeys": {
+        "desiredState": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Desired state of the application (e.g. STARTED, STOPPED)."
+        },
+        "appName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of the application."
+        },
+        "instanceCount": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of running instances."
+        },
+        "totalAllocatedMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total memory allocated for the app = per-instance memory x instance count, in MB."
+        },
+        "memoryPerInstanceMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Memory allocated per instance, in MB."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "appState": "$(.analyze.output.appState)",
+          "appEvents": "$(.analyze.output.appEvents)",
+          "appLogs": "$(.analyze.output.appLogs)"
+        },
+        "executors": [
+          {
+            "execute": "03XP260-<<<TENANT_ID>>>:AppLogsAnalysisClean:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "analyze",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:GetAppLogsAnalysis:1",
+      "name": "GetAppLogsAnalysis",
+      "description": "Get an AI-assisted analysis of the bookshop-srv Cloud Foundry application: its current state, recent application events, and an analysis of its recent logs. Use this to understand how the application is behaving and whether it shows signs of trouble. Credentials and target environment are injected automatically.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "resourceGroup": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "prod",
+          "defaultValueFromInput": null,
+          "description": "Cloud Foundry space the application runs in. Defaults to 'prod'."
+        },
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Password of the SAP BTP account."
+        },
+        "resourceName": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "bookshop-srv",
+          "defaultValueFromInput": null,
+          "description": "Name of the Cloud Foundry application to analyze. Defaults to 'bookshop-srv'."
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "cf-eu10-005",
+          "defaultValueFromInput": null,
+          "description": "Technical SAP BTP region. Defaults to cf-eu10-005."
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "User id / email of the SAP BTP account."
+        },
+        "subAccount": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "SAP BTP subaccount / Cloud Foundry organization."
+        },
+        "identityProvider": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "sap.ids",
+          "defaultValueFromInput": null,
+          "description": "Identity provider origin key. Defaults to sap.ids."
+        }
+      },
+      "outputKeys": {
+        "appState": {
+          "type": "object",
+          "sensitive": false,
+          "description": "Current state of the application."
+        },
+        "appEvents": {
+          "type": "object",
+          "sensitive": false,
+          "description": "Recent application events."
+        },
+        "appLogs": {
+          "type": "array",
+          "sensitive": false,
+          "description": "Recent application logs from SAP Cloud ALM."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "sampleCount": "$(.parse.output.output | join(\"\") | toObject | .count)",
+          "rssMinMb": "$(.parse.output.output | join(\"\") | toObject | .min)",
+          "rssMaxMb": "$(.parse.output.output | join(\"\") | toObject | .max)",
+          "rssLatestMb": "$(.parse.output.output | join(\"\") | toObject | .latest)",
+          "rssAvgMb": "$(.parse.output.output | join(\"\") | toObject | .avg)"
+        },
+        "executors": [
+          {
+            "execute": "cls-<<<TENANT_ID>>>:GetLogs:1",
+            "input": {
+              "size": "100",
+              "query": "$({\"bool\": {\"must\": [{\"match_phrase\": {\"app_name\": \"bookshop-srv\"}}, {\"match_phrase\": {\"source_type\": \"APP/PROC/WEB\"}}, {\"match_phrase\": {\"msg\": \"Memory status\"}}]}})",
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "indexPattern": "logs-cfsyslog-*",
+              "timeRange": "last 15 minutes"
+            },
+            "alias": "getLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "scripts-sapcp:ExecuteScript:2",
+            "input": {
+              "stdin": "$(.getLogs.output.hits | map(.msg) | toMinifiedJsonString)",
+              "script": "#!/usr/bin/env python3\nimport sys, json, re\nmsgs = json.load(sys.stdin)\nvals = []\nfor m in msgs:\n    mt = re.search(r'RSS:\\s*(\\d+)\\s*MB', m or '')\n    if mt:\n        vals.append(int(mt.group(1)))\nif vals:\n    out = {\"count\": len(vals), \"latest\": vals[0], \"min\": min(vals), \"max\": max(vals), \"avg\": round(sum(vals)/len(vals))}\nelse:\n    out = {\"count\": 0, \"latest\": 0, \"min\": 0, \"max\": 0, \"avg\": 0}\nprint(json.dumps(out))"
+            },
+            "alias": "parse",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:GetAppMemoryTrend:1",
+      "name": "GetAppMemoryTrend",
+      "description": "Report the recent memory-usage trend for the bookshop-srv application by reading its 'Memory status' log lines from SAP Cloud Logging over the last 15 minutes and extracting the RSS (resident memory) values. Returns the latest, minimum, maximum and average RSS in MB, plus the number of samples, so you can judge whether memory is climbing toward its limit. Requires no query input.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Logging instance."
+        }
+      },
+      "outputKeys": {
+        "sampleCount": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of memory-status samples found in the window."
+        },
+        "rssMinMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Minimum RSS in MB over the window."
+        },
+        "rssMaxMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Maximum RSS in MB over the window."
+        },
+        "rssLatestMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Most recent RSS (resident memory) in MB."
+        },
+        "rssAvgMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Average RSS in MB over the window."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "hits": "$(.getLogs.output.hits)",
+          "total": "$(.getLogs.output.total)",
+          "count": "$(.getLogs.output.count)"
+        },
+        "executors": [
+          {
+            "execute": "cls-<<<TENANT_ID>>>:GetLogs:1",
+            "input": {
+              "size": "100",
+              "query": "$({\"bool\": {\"must\": [{\"match_phrase\": {\"app_name\": \"bookshop-srv\"}}, {\"match_phrase\": {\"level\": \"error\"}}]}})",
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "indexPattern": "logs-cfsyslog-*",
+              "timeRange": "last 15 minutes"
+            },
+            "alias": "getLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:GetCloudLoggingErrors:1",
+      "name": "GetCloudLoggingErrors",
+      "description": "Retrieve recent application error log entries (level=error) for the bookshop-srv application from SAP Cloud Logging, over the last 15 minutes. Returns application-level errors such as 'Book ID ... not found', so you can see what is failing in the running app. Requires no query input - the error filter is built in.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Logging instance."
+        }
+      },
+      "outputKeys": {
+        "hits": {
+          "type": "array",
+          "sensitive": false,
+          "description": "The matching log entries (bookshop-srv application errors with level=error in the last 15 minutes)."
+        },
+        "total": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total number of matching error log entries in the time range."
+        },
+        "count": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of matching error log entries returned."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "hits": "$(.getLogs.output.hits)",
+          "total": "$(.getLogs.output.total)",
+          "count": "$(.getLogs.output.count)"
+        },
+        "executors": [
+          {
+            "execute": "cls-<<<TENANT_ID>>>:GetLogs:1",
+            "input": {
+              "size": "100",
+              "query": "$({\"bool\": {\"must\": [{\"match_phrase\": {\"app_name\": \"bookshop-srv\"}}, {\"match_phrase\": {\"source_type\": \"APP/PROC/WEB\"}}, {\"match_phrase\": {\"msg\": \"Memory status\"}}]}})",
+              "serviceKey": "$(.execution.input.serviceKey)",
+              "indexPattern": "logs-cfsyslog-*",
+              "timeRange": "last 15 minutes"
+            },
+            "alias": "getLogs",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:GetCloudLoggingMemory:1",
+      "name": "GetCloudLoggingMemory",
+      "description": "Retrieve recent application memory-status log lines for the bookshop-srv application from SAP Cloud Logging, over the last 15 minutes. Returns the Node.js 'Memory status' entries (RSS, Heap, Buffer) emitted by the running app, so you can judge whether the application is under memory pressure. Requires no query input - the memory-status filter is built in.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "serviceKey": {
+          "type": "object",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Service key (JSON credentials) for the SAP Cloud Logging instance."
+        }
+      },
+      "outputKeys": {
+        "hits": {
+          "type": "array",
+          "sensitive": false,
+          "description": "The matching memory-status log entries (bookshop-srv, APP/PROC/WEB, 'Memory status' messages in the last 15 minutes)."
+        },
+        "total": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total number of matching memory-status log entries in the time range."
+        },
+        "count": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of matching memory-status log entries returned."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "appCount": "$(.list.output.totalResultsCount)",
+          "appState": "$(.appState.output.desiredState)",
+          "appNames": "$(.list.output.resourceNames | map(.))",
+          "appName": "$(.appState.output.resourceName)",
+          "appStatesText": "$(.appState.output.resourceName + \"=\" + .appState.output.desiredState)",
+          "appNamesText": "$(.list.output.resourceNames | join(\", \"))"
+        },
+        "executors": [
+          {
+            "execute": "applm-sapcp:ListCfApps:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "pageSize": "100",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "list",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "applm-sapcp:GetCfAppState:2",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.list.output.resourceNames[0])",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "appState",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:ListApps:1",
+      "name": "ListApps",
+      "description": "List all Cloud Foundry applications running in a given space. Use this as the starting point of an investigation to discover which apps exist before drilling into a specific one. Returns the app names and a total count.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "resourceGroup": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "prod",
+          "defaultValueFromInput": null,
+          "description": "Name or GUID of the Cloud Foundry space. Defaults to 'prod'."
+        },
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Password of the SAP BTP account."
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "cf-eu10-005",
+          "defaultValueFromInput": null,
+          "description": "Technical SAP BTP region. Defaults to cf-eu10-005."
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "User id / email of the SAP BTP account."
+        },
+        "subAccount": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Name or GUID of the Cloud Foundry organization."
+        },
+        "identityProvider": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "sap.ids",
+          "defaultValueFromInput": null,
+          "description": "Identity provider origin key. Defaults to sap.ids."
+        }
+      },
+      "outputKeys": {
+        "appCount": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total number of applications in the space."
+        },
+        "appState": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Desired state of the application (e.g. STARTED, STOPPED)."
+        },
+        "appNames": {
+          "type": "array",
+          "sensitive": false,
+          "description": "List of application names in the space."
+        },
+        "appName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of the (first) application."
+        },
+        "appStatesText": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Readable name=state summary, e.g. 'bookshop-srv=STARTED'."
+        },
+        "appNamesText": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Comma-separated list of application names (reliable string form)."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "memoryIncrementMb": "$(.upscale.output.memoryIncrementMb)",
+          "appName": "$(.upscale.output.appName)",
+          "instancesRunning": "$(.upscale.output.instancesRunning)",
+          "newMemoryMb": "$(.upscale.output.newMemoryMb)",
+          "restartState": "$(.upscale.output.restartState)",
+          "previousMemoryMb": "$(.upscale.output.previousMemoryMb)",
+          "restartSummary": "$(.upscale.output.restartSummary)",
+          "instancesTotal": "$(.upscale.output.instancesTotal)"
+        },
+        "executors": [
+          {
+            "execute": "03XP260-<<<TENANT_ID>>>:UpscaleAppClean:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "memoryIncrement": "$(.execution.input.memoryIncrement)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "upscale",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:UpscaleApp:1",
+      "name": "UpscaleApp",
+      "description": "Scale up the bookshop-srv Cloud Foundry application by increasing its allocated memory, then restart it. Use this to remediate an application that is under memory pressure (for example after a health check shows high memory usage). Credentials and target environment are injected automatically.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "resourceGroup": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "prod",
+          "defaultValueFromInput": null,
+          "description": "Cloud Foundry space the application runs in. Defaults to 'prod'."
+        },
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Password of the SAP BTP account."
+        },
+        "resourceName": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "bookshop-srv",
+          "defaultValueFromInput": null,
+          "description": "Name of the Cloud Foundry application to scale. Defaults to 'bookshop-srv'."
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "cf-eu10-005",
+          "defaultValueFromInput": null,
+          "description": "Technical SAP BTP region. Defaults to cf-eu10-005."
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "User id / email of the SAP BTP account used to scale the application."
+        },
+        "memoryIncrement": {
+          "type": "number",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "256",
+          "defaultValueFromInput": null,
+          "description": "Amount of memory in MB to add to the application's current per-instance memory. Defaults to 256."
+        },
+        "subAccount": {
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "SAP BTP subaccount / Cloud Foundry organization."
+        },
+        "identityProvider": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "sap.ids",
+          "defaultValueFromInput": null,
+          "description": "Identity provider origin key. Defaults to sap.ids."
+        }
+      },
+      "outputKeys": {
+        "memoryIncrementMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Memory (MB) that was added."
+        },
+        "appName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of the scaled application."
+        },
+        "instancesRunning": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of instances in RUNNING state after restart."
+        },
+        "newMemoryMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Per-instance memory (MB) after scaling."
+        },
+        "restartState": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Application desired state (e.g. STARTED)."
+        },
+        "previousMemoryMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Per-instance memory (MB) before scaling."
+        },
+        "restartSummary": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Summary of the restart that applied the new memory."
+        },
+        "instancesTotal": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total number of application instances after restart."
+        }
+      },
+      "tags": {}
+    },
+    {
+      "configuration": {
+        "values": [],
+        "output": {
+          "memoryIncrementMb": "$(.execution.input.memoryIncrement | toNumber)",
+          "appName": "$(.getAppState.output.resourceName)",
+          "instancesRunning": "$(.restartApp.output.resourceInstancesStates | filter(.state == \"RUNNING\") | length)",
+          "newMemoryMb": "$(.getAppState.output.memory + (.execution.input.memoryIncrement | toNumber))",
+          "restartState": "$(.restartApp.output.previousDesiredState)",
+          "previousMemoryMb": "$(.getAppState.output.memory)",
+          "restartSummary": "$(.restartApp.output.summary + \" \" + (.restartApp.output.resourceInstancesStates | filter(.state == \"RUNNING\") | length | toString))",
+          "instancesTotal": "$(.restartApp.output.resourceInstancesStates | length)"
+        },
+        "executors": [
+          {
+            "execute": "applm-sapcp:GetCfAppState:2",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "getAppState",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "monitoring-sapcp:GetCfAppEvents:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "eventsNumber": "20",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "getAppEvents",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "applm-sapcp:SetCfAppResources:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "memory": "$(.getAppState.output.memory + (.execution.input.memoryIncrement | toNumber))",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "setAppResources",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": null,
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          },
+          {
+            "execute": "applm-sapcp:RestartCfApp:1",
+            "input": {
+              "resourceGroup": "$(.execution.input.resourceGroup)",
+              "password": "$(.execution.input.password)",
+              "resourceName": "$(.execution.input.resourceName)",
+              "region": "$(.execution.input.region)",
+              "user": "$(.execution.input.user)",
+              "rollingRestart": "false",
+              "subAccount": "$(.execution.input.subAccount)",
+              "identityProvider": "$(.execution.input.identityProvider)"
+            },
+            "alias": "restartApp",
+            "description": null,
+            "progressMessage": null,
+            "initialDelay": null,
+            "pause": null,
+            "when": {
+              "semantic": "OR",
+              "conditions": [
+                {
+                  "semantic": "OR",
+                  "cases": [
+                    {
+                      "expression": "$(.setAppResources.executed)",
+                      "operator": "EQUALS",
+                      "semantic": "OR",
+                      "values": [
+                        "true"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "validate": null,
+            "autoRetry": null,
+            "repeat": null,
+            "errorMessages": [],
+            "dryRun": null
+          }
+        ],
+        "listeners": []
+      },
+      "id": "03XP260-<<<TENANT_ID>>>:UpscaleAppClean:1",
+      "name": "UpscaleAppClean",
+      "description": "Scale up a Cloud Foundry application's memory by 256 MB and restart it to apply the change. All-v3; no external catalog input dependencies.",
+      "catalog": "03XP260-<<<TENANT_ID>>>",
+      "version": 1,
+      "inputKeys": {
+        "resourceGroup": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "dev",
+          "defaultValueFromInput": null,
+          "description": "Technical name of a Cloud Foundry Space, e.g.: my-space-demo-1"
+        },
+        "password": {
+          "type": "string",
+          "sensitive": true,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Cloud Foundry user's password"
+        },
+        "resourceName": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Technical name of a Cloud Foundry application, e.g.: my-app"
+        },
+        "region": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": [
+            "metadata-sapcp:CfRegionData:1"
+          ],
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": " Technical name of a Cloud Foundry region (as defined in CfRegionData), e.g. cf-eu10, cf-br10, etc."
+        },
+        "user": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "UserID/Email of the Cloud Foundry user which will be used for authentication"
+        },
+        "memoryIncrement": {
+          "type": "number",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": 1,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "256",
+          "defaultValueFromInput": null,
+          "description": "Amount of memory in MB to add to the application's current per-instance memory. Defaults to 256."
+        },
+        "subAccount": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": null,
+          "defaultValueFromInput": null,
+          "description": "Technical name of a Cloud Foundry Organization, e.g.: my-org-name-1"
+        },
+        "identityProvider": {
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "minSize": null,
+          "maxSize": null,
+          "minValue": null,
+          "maxValue": null,
+          "allowedValues": null,
+          "allowedValuesFromInputKeys": null,
+          "suggestedValues": null,
+          "suggestedValuesFromInputKeys": null,
+          "defaultValue": "sap.ids",
+          "defaultValueFromInput": null,
+          "description": "Identity provider origin key. Defaults to sap.ids."
+        }
+      },
+      "outputKeys": {
+        "memoryIncrementMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Memory (MB) that was added."
+        },
+        "appName": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Name of the scaled application."
+        },
+        "instancesRunning": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Number of instances in RUNNING state after restart."
+        },
+        "newMemoryMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Per-instance memory (MB) after scaling."
+        },
+        "restartState": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Application desired state (e.g. STARTED)."
+        },
+        "previousMemoryMb": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Per-instance memory (MB) before scaling."
+        },
+        "restartSummary": {
+          "type": "string",
+          "sensitive": false,
+          "description": "Summary of the restart that applied the new memory."
+        },
+        "instancesTotal": {
+          "type": "number",
+          "sensitive": false,
+          "description": "Total number of application instances after restart."
+        }
+      },
+      "tags": {
+        "feature:logs": "",
+        "feature:priority": "medium"
+      }
+    }
+  ]
+}

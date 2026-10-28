@@ -17,7 +17,7 @@ Find below a scenario description and links to all exercise material.
 ## Introduction and Scenario Overview
 
 Workshop overview is shared below covering main interactions: export and transport the app, capture failure events and operate it through governed commands.
-![Architecture diagram](images/xp260-workshop-architecture.png)
+![Architecture diagram](images/xp260-workshop-architecture-v2.png)
 
 ### Scenario Solution Overview 
 
@@ -36,7 +36,7 @@ Work through the complete operational lifecycle: export and transport the applic
 
 **What You'll Champion:**
 
-![Architecture diagram](images/xp260-workshop-explained.png)
+![Architecture diagram](images/xp260-workshop-explained-v2.png)
 
 The hands-on has two parts: first you get the application deployed (Exercises 0–4), then you investigate and operate the already-running application (Exercises 5–6).
 

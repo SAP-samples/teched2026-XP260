@@ -10,6 +10,13 @@ A Joule agent has already been created and deployed for each participant in Joul
 **Application operations** (MCP server #2, already pre-configured for you) — list apps, check memory utilization, analyze logs and memory trends, and scale an application.
 <br><img src="images/ex06-00-02.png" />
 
+> [!NOTE]
+> All SAP Automation Pilot commands and MCP servers made available to the AI agent during this exercise are included in this repository: [Automation Pilot catalogs and MCP servers](https://github.com/SAP-samples/teched2026-XP260/tree/main/exercises/ex4/catalogs-mcpServers).
+>
+> After completing the exercise, you can import this content into your own SAP Automation Pilot test tenant to explore the automation flows in more detail.
+>
+> For further instructions, see [Managing Catalogs](https://help.sap.com/docs/automation-pilot/automation-pilot/catalog#managing-catalogs) and [Managing MCP Servers](https://help.sap.com/docs/automation-pilot/automation-pilot/managing-mcp-servers).
+
 The agent already has the target environment (region, space, organization) and all credentials injected, so **you never need to provide service keys, org, space, or node ids** — you simply describe what you want in natural language.
 
 > **How to work with the agent:** Open your Joule agent and type the prompts shown below. The exact wording does not matter — the agent understands intent, so feel free to rephrase. Where you see a 💬 icon, that is a prompt to type. The screenshots below are **reference interactions**; your transport request ids, node ids and memory figures will differ from the examples.
@@ -20,15 +27,17 @@ You need access to your **target subaccount** (`XP260_T0XX`) and your deployed J
 
 #### Open the Agent
 
-Each participant has their **own dedicated Joule agent**, reachable at a personal URL that matches your participant number. For example, participant **XP260-001** opens:
+Each participant has their **own dedicated Joule agent**, reachable at a personal URL. The URL is identical for everyone except the final segment, which ends in your **seat number** (`XX`, zero-padded to three digits):
 
 ```
-https://xp260-000-0d63gfyl.eu10.sapdas.cloud.sap/webclient/standalone/da_xp260u001
+https://xp260-000-0d63gfyl.eu10.sapdas.cloud.sap/webclient/standalone/da_xp260u0XX
 ```
 
-> **Note:** Use the URL for *your* participant number (shared with you at the start of the session) — it is already wired to your subaccount, MCP servers and credentials.
+For example, participant **XP260-001** (seat **01**) opens: https://xp260-000-0d63gfyl.eu10.sapdas.cloud.sap/webclient/standalone/da_xp260u001
 
-Open your agent URL. You are greeted with an empty chat and a single message box — everything from here on is natural language.
+**IMPORTANT:** Only the `da_xp260u0XX` segment changes — the host stays the same for everyone. Use the URL for *your* seat number (shared with you at the start of the session); it is already wired to your subaccount, MCP servers and credentials.
+
+Open your agent URL to reach **your Joule Day 2 Operations agent**. You are greeted with an empty chat and a single message box — everything from here on is natural language.
 
 <br><img src="images/ex06_01.png" />
 

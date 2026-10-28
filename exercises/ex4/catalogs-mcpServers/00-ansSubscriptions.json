@@ -1,0 +1,53 @@
+{
+  "actions": [
+    {
+      "type": "STORE",
+      "name": "storedAction",
+      "state": "ENABLED",
+      "description": "Stored action for ANS instance on my Source subaccount."
+    }
+  ],
+  "conditions": [
+    {
+      "name": "ctmsImportFinished",
+      "mandatory": false,
+      "propertyKey": "eventType",
+      "predicate": "EQUALS",
+      "propertyValue": "TmsImportFinished",
+      "labels": [],
+      "description": ""
+    },
+    {
+      "name": "severityError",
+      "mandatory": false,
+      "propertyKey": "severity",
+      "predicate": "EQUALS",
+      "propertyValue": "ERROR",
+      "labels": [],
+      "description": ""
+    },
+    {
+      "name": "severityFatal",
+      "mandatory": false,
+      "propertyKey": "severity",
+      "predicate": "EQUALS",
+      "propertyValue": "FATAL",
+      "labels": [],
+      "description": ""
+    }
+  ],
+  "subscriptions": [
+    {
+      "name": "ctmsTransportFailed",
+      "conditions": [
+        "ctmsImportFinished",
+        "severityError",
+        "severityFatal"
+      ],
+      "actions": [
+        "storedAction"
+      ],
+      "state": "ENABLED"
+    }
+  ]
+}
